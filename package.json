@@ -157,6 +157,7 @@
   "workspaces": [
     "src/api/extensions/*",
     "src/platform/*",
+    "src/modules/*",
     "packages/*"
   ]
 }

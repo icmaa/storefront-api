@@ -1,0 +1,16 @@
+{
+  "name": "icmaa-cms",
+  "version": "1.0.0",
+  "main": "index.ts",
+  "author": "cewald <c.ewald@impericon.com> and contributors",
+  "license": "MIT",
+  "private": true,
+  "dependencies": {
+    "@types/qs": "^6.9.1",
+    "marked": "^1.1.1",
+    "node-fetch": "^2.6.0",
+    "qs": "^6.9.1",
+    "storyblok-js-client": "^2.0.0",
+    "yaml": "^1.10.0"
+  }
+}
