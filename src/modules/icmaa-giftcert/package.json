@@ -2,7 +2,7 @@
   "name": "icmaa-giftcert",
   "version": "1.0.0",
   "main": "index.js",
-  "author": "schill <schill@impericon.com> and contributors",
+  "author": "cewald <cewald@impericon.com> and contributors",
   "license": "MIT",
   "private": true
 }

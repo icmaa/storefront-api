@@ -33,8 +33,17 @@ This API extension get data from headless cms of choice.
   },
    ```
 
+3. Change the original endpoint of VSF in `local.json` to:
+   ```
+   "icmaa_cms": {
+     "endpoint": "/api/icmaa-cms"
+   }
+   ```
+
 ## API endpoints
 ```
 /api/ext/icmaa-cms/by-uid?uid=navigation-main&type=block&lang=de-de
+/api/icmaa-cms/by-uid?uid=navigation-main&type=block&lang=de-de
 /api/ext/icmaa-cms/search?type=block&lang=de-de&q={"identifier":%20{"in":%20"navigation-meta,navigation-main"}}
+/api/icmaa-cms/search?type=block&lang=de-de&q={"identifier":%20{"in":%20"navigation-meta,navigation-main"}}
 ```

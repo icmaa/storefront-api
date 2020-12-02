@@ -9,11 +9,12 @@ This API extension add Magento1 actions for a custom `vsf-bridge` endpoint in Ma
 2. Change the original endpoint of VSF in `local.json` to:
    ```
    "icmaa_giftcert": {
-     "endpoint": "/api/ext/icmaa-giftcert"
+     "endpoint": "/api/icmaa-giftcert"
    }
    ```
 
 ## API endpoints
 ```
 /api/ext/icmaa-giftcert
+/api/icmaa-giftcert
 ```
