@@ -9,11 +9,12 @@ This API extension add Magento1 actions for a custom `vsf-bridge` endpoint in Ma
 2. Add endpoints to VSF in `local.json`:
    ```
    "users": {
-     "last_order": "/api/ext/icmaa-user/last-order?token={{token}}"
+     "last_order": "/api/icmaa-user/last-order?token={{token}}"
    }
    ```
 
 ## API endpoints
 ```
 /api/ext/icmaa-user/last-order
+/api/icmaa-user/last-order
 ```

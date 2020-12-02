@@ -18,7 +18,15 @@ This API extension gets data from Twitter API
   },
    ```
 
+3. Change the original endpoint of VSF in `local.json` to:
+   ```
+   "icmaa_twitter": {
+     "endpoint": "/api/icmaa-twitter"
+   }
+   ```
+
 ## API endpoints
 ```
 /api/ext/icmaa-twitter/feed/USERACCOUNT
+/api/icmaa-twitter/feed/USERACCOUNT
 ```
