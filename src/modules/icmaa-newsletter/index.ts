@@ -1,9 +1,10 @@
 import { Router } from 'express'
-import { apiStatus } from '../../../lib/util'
-import { newMagentoClientAction } from '../icmaa/helpers'
+import { apiStatus } from '@storefront-api/lib/util'
+import { ExtensionAPIFunctionParameter } from '@storefront-api/lib/module'
+import { newMagentoClientAction } from 'icmaa/helpers'
 
-module.exports = ({ config }) => {
-  let api = Router()
+module.exports = ({ config }: ExtensionAPIFunctionParameter): Router => {
+  const api = Router()
 
   const urlPrefix = 'newsletter/'
 

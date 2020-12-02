@@ -11,10 +11,10 @@ It also adds an endpoint to create vouchers using the API.
 2. Change the original endpoint of VSF in `local.json` to:
    ```
    "newsletter": {
-     "endpoint": "/api/ext/icmaa-newsletter/subscribe",
+     "endpoint": "/api/icmaa-newsletter/subscribe",
      "endpoint_voucher": {
-       "birthday": "/api/ext/icmaa-newsletter/birthday-voucher",
-       "default": "/api/ext/icmaa-newsletter/voucher"
+       "birthday": "/api/icmaa-newsletter/birthday-voucher",
+       "default": "/api/icmaa-newsletter/voucher"
      }
    }
    ```
@@ -22,6 +22,9 @@ It also adds an endpoint to create vouchers using the API.
 ## API endpoints
 ```
 /api/ext/icmaa-newsletter/subscribe
+/api/icmaa-newsletter/subscribe
 /api/ext/icmaa-newsletter/voucher
+/api/icmaa-newsletter/voucher
 /api/ext/icmaa-newsletter/birthday-voucher
+/api/icmaa-newsletter/birthday-voucher
 ```
