@@ -9,7 +9,7 @@ This API extension add Magento1 actions for a custom `vsf-bridge` endpoint in Ma
 2. Add the endpoint of VSF in `local.json` to:
    ```
    "icmaa_product_alert": {
-    "endpoint": "/api/ext/icmaa-product-alert",
+    "endpoint": "/api/icmaa-product-alert",
     ...
    }
    ```
@@ -17,4 +17,5 @@ This API extension add Magento1 actions for a custom `vsf-bridge` endpoint in Ma
 ## API endpoints
 ```
 /api/ext/icmaa-product-alert/stock
+/api/icmaa-product-alert/stock
 ```

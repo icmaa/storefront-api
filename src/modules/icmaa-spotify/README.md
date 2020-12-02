@@ -18,7 +18,15 @@ This API extension gets data from Spotify API
   },
    ```
 
+3. Change the original endpoint of VSF in `local.json` to:
+   ```
+   "icmaa_spotify": {
+     "endpoint": "/api/icmaa-spotify",
+   }
+   ```
+
 ## API endpoints
 ```
 /api/ext/icmaa-spotify/related-artists/NAME
+/api/icmaa-spotify/related-artists/NAME
 ```

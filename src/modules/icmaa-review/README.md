@@ -9,11 +9,12 @@ This API extension add Magento1 actions for a custom `vsf-bridge` endpoint in Ma
 2. Change the original endpoint of VSF in `local.json` to:
    ```
    "review": {
-     "create_endpoint": "/api/ext/icmaa-review/create"
+     "create_endpoint": "/api/icmaa-review/create"
    }
    ```
 
 ## API endpoints
 ```
 /api/ext/icmaa-review/create
+/api/icmaa-review/create
 ```

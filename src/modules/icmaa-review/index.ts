@@ -1,19 +1,21 @@
 import { Router } from 'express'
-import { apiStatus } from '../../../lib/util'
-import { newMagentoClientAction } from '../icmaa/helpers'
-import GoogleRecaptcha from '../icmaa/helpers/googleRecaptcha'
+import { apiStatus } from '@storefront-api/lib/util'
+import { ExtensionAPIFunctionParameter } from '@storefront-api/lib/module'
+
+import { newMagentoClientAction } from 'icmaa/helpers'
+import GoogleRecaptcha from 'icmaa/helpers/googleRecaptcha'
 
 const Ajv = require('ajv')
 
-module.exports = ({ config }) => {
-  let api = Router()
+module.exports = ({ config }: ExtensionAPIFunctionParameter): Router => {
+  const api = Router()
 
   const urlPrefix = 'review/'
 
   api.post('/create', async (req, res) => {
     const recaptcha = await GoogleRecaptcha(req.body.review.recaptcha, config)
     if (recaptcha !== true) {
-      apiStatus(res, recaptcha, 500)
+      apiStatus(res, recaptcha as string, 500)
       return
     }
 
@@ -21,7 +23,7 @@ module.exports = ({ config }) => {
     const reviewSchema = require('./review.schema.json')
     const validate = ajv.compile(reviewSchema)
 
-    req.body.review.review_status = config.review.defaultReviewStatus
+    req.body.review.review_status = config.get<number>('review.defaultReviewStatus')
 
     if (!validate(req.body)) {
       apiStatus(res, validate.errors, 500)
