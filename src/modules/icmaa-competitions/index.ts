@@ -1,10 +1,9 @@
 import { Router } from 'express'
 import { apiStatus } from '@storefront-api/lib/util'
-
 import { ExtensionAPIFunctionParameter } from '@storefront-api/lib/module'
 
-import GoogleRecaptcha from '../icmaa/helpers/googleRecaptcha'
-import Redis from '../icmaa/helpers/redis'
+import GoogleRecaptcha from 'icmaa/helpers/googleRecaptcha'
+import Redis from 'icmaa/helpers/redis'
 import { google } from 'googleapis'
 
 module.exports = ({ config }: ExtensionAPIFunctionParameter): Router => {

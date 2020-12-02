@@ -9,7 +9,7 @@ This API extension gets data from our custom Facebook-Login endpoints of the `vs
 2. Add the endpoint of VSF in `local.json` to:
    ```
    "icmaa_facebook": {
-    "endpoint": "/api/ext/icmaa-facebook",
+    "endpoint": "/api/icmaa-facebook",
     ...
    }
    ```
@@ -17,4 +17,5 @@ This API extension gets data from our custom Facebook-Login endpoints of the `vs
 ## API endpoints
 ```
 /api/ext/icmaa-facebook/login
+/api/icmaa-facebook/login
 ```
