@@ -1,20 +1,21 @@
 import { Router } from 'express'
-import { apiStatus } from '../../../lib/util'
+import { apiStatus } from '@storefront-api/lib/util'
+import { ExtensionAPIFunctionParameter } from '@storefront-api/lib/module'
 
 import NodeMailer from 'nodemailer'
 import jwt from 'jwt-simple'
 
-import GoogleRecaptcha from '../icmaa/helpers/googleRecaptcha'
-import Redis from '../icmaa/helpers/redis'
+import GoogleRecaptcha from 'icmaa/helpers/googleRecaptcha'
+import Redis from 'icmaa/helpers/redis'
 
-module.exports = ({ config }) => {
-  let api = Router()
+module.exports = ({ config }: ExtensionAPIFunctionParameter): Router => {
+  const api = Router()
 
   const tokenLimit = 5
   const getCurrentTimestamp = () => Math.floor(new Date().getTime() / 1000)
 
   api.get('/get-token', (req, res) => {
-    const token = jwt.encode(getCurrentTimestamp(), config.extensions.mailService.secretString)
+    const token = jwt.encode(getCurrentTimestamp(), config.get<string>('extensions.mailService.secretString'))
     apiStatus(res, token, 200)
   })
 
@@ -23,7 +24,7 @@ module.exports = ({ config }) => {
 
     const recaptchaCheck = await GoogleRecaptcha(recaptcha, config)
     if (recaptchaCheck !== true) {
-      apiStatus(res, recaptchaCheck, 500)
+      apiStatus(res, recaptchaCheck as string, 500)
       return
     }
 
@@ -42,12 +43,12 @@ module.exports = ({ config }) => {
     }
 
     const currentTime = getCurrentTimestamp()
-    const tokenTime = jwt.decode(userData.token, config.extensions.mailService.secretString)
+    const tokenTime = jwt.decode(userData.token, config.get<string>('extensions.mailService.secretString'))
     if (currentTime - tokenTime > tokenLimit) {
       apiStatus(res, 'Token has expired ', 500)
     }
 
-    const { host, port, secure, user, pass } = config.extensions.mailService.transport
+    const { host, port, secure, user, pass } = config.get<Record<string, any>>('extensions.mailService.transport')
     if (!host || !port || !user || !pass) {
       apiStatus(res, 'No transport is defined for mail service!', 500)
     }
@@ -60,15 +61,15 @@ module.exports = ({ config }) => {
       return
     }
 
-    const whiteList = config.extensions.mailService.targetAddressWhitelist
+    const whiteList = config.get<string[]>('extensions.mailService.targetAddressWhitelist')
     const email = userData.confirmation ? userData.sourceAddress : userData.targetAddress
-    if (!whiteList.find(e => (email.startsWith(e) || email.endsWith(e)))) {
+    if (!whiteList.some(e => (email.startsWith(e) || email.endsWith(e) || email.endsWith(e + '>')))) {
       apiStatus(res, `Target email address (${email}) is not from the whitelist!`, 500)
       return
     }
 
     const auth = { user, pass }
-    let transporter = NodeMailer.createTransport({ auth, host, port, secure })
+    const transporter = NodeMailer.createTransport({ auth, host, port, secure })
 
     const { text, html, replyTo } = userData
     const mailOptions = {

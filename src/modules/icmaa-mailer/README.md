@@ -28,8 +28,8 @@ We are using a new endpoint based onto the `/api/ext/mail-service/send-email` on
    ```
    "mailer": {
      "endpoint": {
-       "send": "/api/ext/icmaa-mailer/send-email",
-       "token": "/api/ext/icmaa-mailer/get-token"
+       "send": "/api/icmaa-mailer/send-email",
+       "token": "/api/icmaa-mailer/get-token"
      }
    }
    ```
@@ -37,5 +37,7 @@ We are using a new endpoint based onto the `/api/ext/mail-service/send-email` on
 ## API endpoints
 ```
 /api/ext/icmaa-mailer/send-email
+/api/icmaa-mailer/send-email
 /api/ext/icmaa-mailer/get-token
+/api/icmaa-mailer/get-token
 ```
