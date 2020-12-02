@@ -8,10 +8,10 @@ import storyblokConnector from '../connector/storyblok'
 import { cacheResult, cacheHandler } from '../connector/cache'
 import { getClient as esClient, adjustQuery, getTotals, getHits } from '@storefront-api/lib/elastic-es7'
 
-export default ({ config }: ExtensionAPIFunctionParameter): any => {
-  const app = Router()
+export default ({ config }: ExtensionAPIFunctionParameter): Router => {
+  const api = Router()
 
-  app.get('/by-uid', async (req, res) => {
+  api.get('/by-uid', async (req, res) => {
     const { url, query } = req
     const { type, uid, lang, key } = query
     if (type === undefined || uid === undefined) {
@@ -44,7 +44,7 @@ export default ({ config }: ExtensionAPIFunctionParameter): any => {
     }
   })
 
-  app.get('/search', async (req, res) => {
+  api.get('/search', async (req, res) => {
     const { url, query } = req
     const { type, q, lang, fields } = query
     if (type === undefined || q === undefined) {
@@ -77,7 +77,7 @@ export default ({ config }: ExtensionAPIFunctionParameter): any => {
     }
   })
 
-  app.get('/attribute/:codes', async (req, res) => {
+  api.get('/attribute/:codes', async (req, res) => {
     const query = adjustQuery({
       index: config.get<string[]>('elasticsearch.indices')[0],
       method: req.method
@@ -124,7 +124,7 @@ export default ({ config }: ExtensionAPIFunctionParameter): any => {
     }).catch(e => apiStatus(res, 'Elasticsearch client: ' + e.message, 500))
   })
 
-  app.get('/categories', async (req, res) => {
+  api.get('/categories', async (req, res) => {
     const query = adjustQuery({
       index: config.get<string[]>('elasticsearch.indices')[0],
       size: 5000
@@ -174,7 +174,7 @@ export default ({ config }: ExtensionAPIFunctionParameter): any => {
     }).catch(e => apiStatus(res, 'Elasticsearch client: ' + e.message, 500))
   })
 
-  app.get('/datasource/:code', async (req, res) => {
+  api.get('/datasource/:code', async (req, res) => {
     const { url, params } = req
     const { code } = params
     if (code === undefined) {
@@ -207,7 +207,7 @@ export default ({ config }: ExtensionAPIFunctionParameter): any => {
     }
   })
 
-  app.get('/edit/:id', async (req, res) => {
+  api.get('/edit/:id', async (req, res) => {
     const { id } = req.params
     if (id === undefined) {
       return apiStatus(res, '"id" is mandatory in request url', 500)
@@ -226,5 +226,5 @@ export default ({ config }: ExtensionAPIFunctionParameter): any => {
     }
   })
 
-  return app
+  return api
 }

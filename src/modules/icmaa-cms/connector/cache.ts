@@ -1,5 +1,5 @@
-import cache from '../../../../lib/cache-instance'
-import { apiStatus } from '../../../../lib/util'
+import cache from '@storefront-api/lib/cache-instance'
+import { apiStatus } from '@storefront-api/lib/util'
 
 const cacheResult = (config: Record<string, any>, result: any, hash: string, tags: string[]): void => {
   if (config.server.useOutputCache && cache) {

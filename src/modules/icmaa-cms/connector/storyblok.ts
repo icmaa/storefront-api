@@ -2,7 +2,7 @@ import config from 'config'
 
 import qs from 'qs'
 import fetch from 'node-fetch'
-import cache from '../../../../lib/cache-instance'
+import cache from '@storefront-api/lib/cache-instance'
 
 import { objectKeysToCamelCase } from '../helpers/formatter'
 import { extractStoryContent, extractPluginValues } from '../helpers/formatter/storyblok'
@@ -10,7 +10,7 @@ import { sortBy, pick, merge } from 'lodash'
 
 interface CreateAttributeOptionArrayParams {
   options: any[],
-  nameKey?: string|Function,
+  nameKey?: string | ((option: string|any) => any),
   valueKey?: string,
   sortKey?: string
 }
@@ -20,7 +20,7 @@ class StoryblokConnector {
 
   public api () {
     return {
-      get: async (endpoint: string = 'cdn/stories', params: Record<string, any> = {}, cv?: string): Promise<any> => {
+      get: async (endpoint = 'cdn/stories', params: Record<string, any> = {}, cv?: string): Promise<any> => {
         const baseUrl = 'https://api.storyblok.com/v1'
         const defaults = {
           token: config.get('extensions.icmaaCms.storyblok.accessToken'),
@@ -49,7 +49,7 @@ class StoryblokConnector {
       },
       cv: async (): Promise<string> => {
         const cacheKey = 'storyblokCacheVersion'
-        if (!config.get('server.useOutputCache') || !cache || !cache.hasOwnProperty('get')) {
+        if (!config.get('server.useOutputCache') || !cache || !cache.get) {
           return Date.now().toString()
         }
 
@@ -61,7 +61,7 @@ class StoryblokConnector {
             .get('cdn/spaces/me', {}, 'justnow')
             .then(resp => {
               const cv = resp.space.version.toString()
-              return cache.set(cacheKey, cv, ['cms', `cms-cacheversion`])
+              return cache.set(cacheKey, cv, ['cms', 'cms-cacheversion'])
                 .then(() => cv)
             })
         }).catch(e => {
@@ -81,10 +81,10 @@ class StoryblokConnector {
 
   public isJsonString (string) {
     try {
-      let query = JSON.parse(string)
+      const query = JSON.parse(string)
       for (const key in query) {
         if (key.startsWith('i18n_')) {
-          query['__or'] = [
+          query.__or = [
             { [this.getKey(key)]: query[key] },
             { [key.slice(5)]: query[key] }
           ]
@@ -99,85 +99,78 @@ class StoryblokConnector {
     }
   }
 
-  public getKey (key: string = 'identifier'): string {
+  public getKey (key = 'identifier'): string {
     return (key.startsWith('i18n_')) ? key.slice(5) + '__i18n__' + this.lang : key
   }
 
   public async fetch ({ type, uid, lang, key }) {
-    try {
-      let request: Promise<any>
-      const fetchById = (key && key === 'id')
+    let request: Promise<any>
+    const fetchById = (key && key === 'id')
 
-      this.matchLanguage(lang)
+    this.matchLanguage(lang)
 
-      if (!fetchById) {
-        let query: any = { [this.getKey(key)]: { 'in': uid } }
-        if (key && key.startsWith('i18n_')) {
-          query = {
-            '__or': [
-              { [this.getKey(key)]: { 'in': uid } },
-              { [key.slice(5)]: { 'in': uid } }
-            ]
-          }
+    if (!fetchById) {
+      let query: any = { [this.getKey(key)]: { in: uid } }
+      if (key && key.startsWith('i18n_')) {
+        query = {
+          // eslint-disable-next-line @typescript-eslint/naming-convention
+          __or: [
+            { [this.getKey(key)]: { in: uid } },
+            { [key.slice(5)]: { in: uid } }
+          ]
         }
-
-        request = this.api().get('cdn/stories', {
-          'starts_with': this.lang ? `${this.lang}/*` : '',
-          'filter_query_v2': {
-            'component': { 'in': type },
-            ...query
-          }
-        })
-      } else {
-        request = this.api().get(
-          `cdn/stories/${uid}`,
-          { language: this.lang ? this.lang : undefined }
-        )
       }
 
-      return request
-        .then(async response => {
-          const story = fetchById
-            ? response.story || {}
-            : response.stories.shift() || {}
-          const content = extractStoryContent(story)
-          objectKeysToCamelCase(content)
-          await extractPluginValues(content).catch(e => {
-            console.error('Error during plugin value mapping:', e)
-          })
-          return content
-        }).catch(e => {
-          console.error('Error during parsing:', e)
-          return { }
-        })
-    } catch (error) {
-      throw error
+      request = this.api().get('cdn/stories', {
+        starts_with: this.lang ? `${this.lang}/*` : '',
+        filter_query_v2: {
+          component: { in: type },
+          ...query
+        }
+      })
+    } else {
+      request = this.api().get(
+        `cdn/stories/${uid}`,
+        { language: this.lang ? this.lang : undefined }
+      )
     }
+
+    return request
+      .then(async response => {
+        const story = fetchById
+          ? response.story || {}
+          : response.stories.shift() || {}
+        const content = extractStoryContent(story)
+        objectKeysToCamelCase(content)
+        await extractPluginValues(content).catch(e => {
+          console.error('Error during plugin value mapping:', e)
+        })
+        return content
+      }).catch(e => {
+        console.error('Error during parsing:', e)
+        return { }
+      })
   }
 
   public async search ({ type, q, lang, fields }) {
     this.matchLanguage(lang)
 
-    let queryObject: any = { 'identifier': { 'in': q } }
+    let queryObject: any = { identifier: { in: q } }
     const jsonQuery: any = this.isJsonString(q)
     if (jsonQuery) {
       queryObject = jsonQuery
     }
 
-    try {
-      return this.searchRequest({ queryObject, type, page: 1, fields })
-    } catch (error) {
-      throw error
-    }
+    return this.searchRequest({ queryObject, type, page: 1, fields })
   }
 
   public async searchRequest ({ queryObject, type, page = 1, results = [], fields }) {
     return this.api().get('cdn/stories', {
-      'page': page,
-      'per_page': 25,
-      'starts_with': this.lang ? `${this.lang}/*` : '',
-      'filter_query_v2': {
-        'component': { 'in': type },
+      page: page,
+      per_page: 25,
+      starts_with: this.lang ? `${this.lang}/*` : '',
+      filter_query_v2: {
+        component: { in: type },
         ...queryObject
       }
     }).then(async response => {
@@ -211,9 +204,9 @@ class StoryblokConnector {
     let result = []
     options.forEach(option => {
       result.push({
-        'name': typeof nameKey === 'function' ? nameKey(option) : option[nameKey],
-        'value': option[valueKey],
-        'sort_order': sortKey ? option[sortKey as string] : 1
+        name: typeof nameKey === 'function' ? nameKey(option) : option[nameKey],
+        value: option[valueKey],
+        sort_order: sortKey ? option[sortKey as string] : 1
       })
     })
 
@@ -226,8 +219,8 @@ class StoryblokConnector {
     try {
       return this.api().get('cdn/datasource_entries', {
         datasource: code,
-        'page': page,
-        'per_page': 1000
+        page: page,
+        per_page: 1000
       }).then(response => {
         return response.datasource_entries.map(e => ({ value: e.value, label: e.name }))
       }).catch(() => {

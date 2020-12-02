@@ -1,8 +1,8 @@
-import { StorefrontApiModule } from '@storefront-api/lib/module'
+import { Router } from 'express'
+import { ExtensionAPIFunctionParameter } from '@storefront-api/lib/module'
+import routes from './api'
 
-export const TemplateModule: StorefrontApiModule = new StorefrontApiModule({
-  key: 'icmaa-cms',
-  initApi: (): void => {
-    // ...
-  }
-})
+module.exports = ({ config, db }: ExtensionAPIFunctionParameter): Router => {
+  const api = routes({ config, db })
+  return api
+}
