@@ -8,19 +8,19 @@ interface MultiMatchItem {
   [key: string]: { boost: number } | MultiMatchItem | any
 }
 
-const multiMatchConfigFields = ['operator', 'fuzziness', 'cutoff_frequency', 'max_expansions',
+const multiMatchConfigFields: string[] = ['operator', 'fuzziness', 'cutoff_frequency', 'max_expansions',
   'prefix_length', 'minimum_should_match', 'tie_breaker', 'analyzer']
 
 const getMultimatchQuery = (queryChain: any, fields: MultiMatchItem, multiMatchConfig: any, nestedPath?: string): any => {
   nestedPath = nestedPath ? nestedPath + '.' : ''
-  let readyFields = []
+  const readyFields = []
   forEach(fields, (value, path) => {
-    if (value.hasOwnProperty('boost')) {
-      readyFields.push(nestedPath + path + '^' + value['boost'])
+    if (value.boost !== undefined) {
+      readyFields.push(nestedPath + path + '^' + value.boost)
     } else {
       const nestedMultiMatchConfig = Object.assign({}, multiMatchConfig, pick(fields[path], multiMatchConfigFields))
       queryChain.orQuery('nested', { path: nestedPath + path }, nestedQueryChain =>
-        getMultimatchQuery(nestedQueryChain, omit(fields[path], multiMatchConfigFields), nestedMultiMatchConfig, nestedPath + path)
+        getMultimatchQuery(nestedQueryChain, omit(fields[path], multiMatchConfigFields) as MultiMatchItem, nestedMultiMatchConfig, nestedPath + path)
       )
     }
   })
@@ -47,15 +47,15 @@ const filter: FilterInterface = {
 
     let newQueryChain = this.bodybuilder()
 
-    let searchableAttributes: MultiMatchItem = this.config.elasticsearch.hasOwnProperty('searchableAttributes')
-      ? this.config.elasticsearch.searchableAttributes : { 'name': { 'boost': 1 } }
+    const searchableAttributes: MultiMatchItem = this.config.elasticsearch.searchableAttributes !== undefined
+      ? this.config.elasticsearch.searchableAttributes : { name: { boost: 1 } }
 
     const multiMatchConfig = getMultiMatchConfig(this.config, value)
     newQueryChain = getMultimatchQuery(newQueryChain, searchableAttributes, multiMatchConfig)
 
     newQueryChain.orQuery('match_phrase', 'sku', { query: value, boost: 1 })
 
-    let functionScore = getFunctionScores(this.config)
+    const functionScore = getFunctionScores(this.config)
     if (functionScore) {
       this.queryChain.query('function_score', functionScore, () => newQueryChain)
     } else {
@@ -66,10 +66,10 @@ const filter: FilterInterface = {
     // And sort them by their max score first and then by documents found with this category
     if (!attribute.endsWith('plain')) {
       this.queryChain.agg('nested', { path: 'category' }, 'categories_found', b => {
-        const options = { size: 50, order: [ { 'max_score': 'desc' }, { '_count': 'desc' } ] }
+        const options = { size: 50, order: [{ max_score: 'desc' }, { _count: 'desc' }] }
         return b.agg('terms', 'category.category_id', options, 'categories', c => {
           return c.agg('max', { script: '_score' }, 'max_score')
-            .agg('top_hits', { _source: [ 'category.name', 'category.category_id', 'category.position' ], size: 1 }, 'hits')
+            .agg('top_hits', { _source: ['category.name', 'category.category_id', 'category.position'], size: 1 }, 'hits')
         })
       })
     }

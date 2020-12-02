@@ -1,6 +1,6 @@
 import { FilterInterface } from 'storefront-query-builder'
 
-export const extractFirstValueMutator = (value): any[] => {
+export const extractFirstValueMutator = (value: any[]|Record<string, any>|null): any[]|Record<string, any>|null => {
   value = value[Object.keys(value)[0]]
   if (!Array.isArray(value) && value !== null) {
     value = [value]

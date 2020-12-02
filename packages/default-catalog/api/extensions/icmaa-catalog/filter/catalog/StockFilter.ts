@@ -41,7 +41,7 @@ const filter: FilterInterface = {
             .query('nested', { path: 'configurable_children.stock' }, confChildStockQuery =>
               confChildStockQuery
                 .query('term', 'configurable_children.stock.is_in_stock', true)
-                .query('range', 'configurable_children.stock.qty', { 'gt': 0 })
+                .query('range', 'configurable_children.stock.qty', { gt: 0 })
             )
         }
 
@@ -57,7 +57,7 @@ const filter: FilterInterface = {
           bndlQuery.filter('term', 'stock.is_in_stock', true)
         }
 
-        let bndlOptionsQuery = this.bodybuilder()
+        const bndlOptionsQuery = this.bodybuilder()
 
         if (hasConfOptions || hasStockFilter) {
           bndlOptionsQuery.query('nested', { path: 'bundle_options.product_links' }, productLinksQuery => {
@@ -65,7 +65,7 @@ const filter: FilterInterface = {
               const options = { path: 'bundle_options.product_links.stock' }
               productLinksQuery.query('nested', options, productLinksStockQuery => {
                 return productLinksStockQuery.query('term', 'bundle_options.product_links.stock.is_in_stock', true)
-                  .query('range', 'bundle_options.product_links.stock.qty', { 'gt': 0 })
+                  .query('range', 'bundle_options.product_links.stock.qty', { gt: 0 })
               })
             }
 
@@ -102,7 +102,7 @@ const filter: FilterInterface = {
         if (hasStockFilter) {
           smplQuery
             .filter('term', 'stock.is_in_stock', true)
-            .filter('range', 'stock.qty', { 'gt': 0 })
+            .filter('range', 'stock.qty', { gt: 0 })
         }
 
         return smplQuery

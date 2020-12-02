@@ -24,11 +24,11 @@ const filter: FilterInterface = {
   filter ({ queryChain, value, attribute, operator }) {
     queryChain.query('nested', { path: 'configurable_children' }, confChildQuery => {
       confChildQuery.query('bool', childBoolWrapper => {
-        let filters: FilterInterface[] = Object.values(this.baseFilters)
-        for (let filterHandler of filters) {
+        const filters: FilterInterface[] = Object.values(this.baseFilters)
+        for (const filterHandler of filters) {
           const { queryChain } = this
           if (filterHandler.check({ operator, attribute, value, queryChain })) {
-            value = filterHandler.hasOwnProperty('mutator') ? filterHandler.mutator(value) : value
+            value = filterHandler.mutator !== undefined ? filterHandler.mutator(value) : value
             const filterParams = {
               operator,
               attribute: isKeywordAttribute(attribute) ? attribute + '.keyword' : attribute,

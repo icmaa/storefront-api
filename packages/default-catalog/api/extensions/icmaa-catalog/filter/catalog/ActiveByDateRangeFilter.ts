@@ -10,7 +10,7 @@ const filter: FilterInterface = {
   check: ({ attribute }) => attribute === 'activeDateRange',
   filter ({ queryChain, value }) {
     // Empty values populated as `{ "in": "" }` – this would crash our query.
-    if (Object.keys(value).length === 1 && value.hasOwnProperty('in')) {
+    if (Object.keys(value).length === 1 && value.in !== undefined) {
       value = {}
     }
 
@@ -29,7 +29,7 @@ const filter: FilterInterface = {
               return rangeFromEmptyQuery.notFilter('exists', fromField)
             })
             .orFilter('range', fromField, {
-              ...Object.assign({}, { 'lte': dateTime }, value)
+              ...Object.assign({}, { lte: dateTime }, value)
             })
         })
         // To
@@ -39,7 +39,7 @@ const filter: FilterInterface = {
               return rangeToEmptyQuery.notFilter('exists', toField)
             })
             .orFilter('range', toField, {
-              ...Object.assign({}, { 'gte': dateTime }, value)
+              ...Object.assign({}, { gte: dateTime }, value)
             })
         })
 
