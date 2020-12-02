@@ -1,19 +1,21 @@
 import { Router } from 'express'
-import { apiStatus } from '../../../lib/util'
+import { apiStatus } from '@storefront-api/lib/util'
+
+import { ExtensionAPIFunctionParameter } from '@storefront-api/lib/module'
 
 import GoogleRecaptcha from '../icmaa/helpers/googleRecaptcha'
 import Redis from '../icmaa/helpers/redis'
 import { google } from 'googleapis'
 
-module.exports = ({ config }) => {
-  let api = Router()
+module.exports = ({ config }: ExtensionAPIFunctionParameter): Router => {
+  const api = Router()
 
   api.post('/form', async (req, res) => {
     const { spreadsheetId, form } = req.body
 
     const recaptcha = await GoogleRecaptcha(form.recaptcha, config)
     if (recaptcha !== true) {
-      apiStatus(res, recaptcha, 500)
+      apiStatus(res, recaptcha as string, 500)
       return
     } else {
       delete form.recaptcha
@@ -27,7 +29,7 @@ module.exports = ({ config }) => {
       }
     }
 
-    const credentials = config.icmaa.googleServiceAccount
+    const credentials = config.get<Record<string, any>>('icmaa.googleServiceAccount')
     const clientOptions = { subject: credentials.subject }
     const scopes = ['https://www.googleapis.com/auth/spreadsheets']
     const auth = new google.auth.GoogleAuth({ scopes, clientOptions, credentials })
@@ -52,18 +54,18 @@ module.exports = ({ config }) => {
         range: 'A1',
         includeValuesInResponse: true,
         valueInputOption: 'raw',
-        resource: {
+        requestBody: {
           values: [
             Object.values(form)
           ]
         }
       })
-      .then(async resp => {
+      .then(async () => {
         if (form.ip) {
           await redis.set(form.ip, true, [])
         }
 
-        apiStatus(res, true, 200)
+        apiStatus(res, 'true', 200)
       })
       .catch(err => {
         apiStatus(res, err.message, 500)

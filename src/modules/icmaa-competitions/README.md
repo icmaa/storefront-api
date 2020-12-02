@@ -52,11 +52,12 @@ To be able to access a doc/spreadsheet using a service-account we need to
 3. Change the original endpoint of VSF in `local.json` to:
    ```
    "icmaa_competitions": {
-     "endpoint": "/api/ext/icmaa-competitions"
+     "endpoint": "/api/icmaa-competitions"
    }
    ```
 
 ## API endpoints
 ```
 /api/ext/icmaa-competitions/form
+/api/icmaa-competitions/form
 ```
