@@ -6,7 +6,7 @@ import { Router } from 'express'
 
 import storyblokConnector from '../connector/storyblok'
 import { cacheResult, cacheHandler } from '../connector/cache'
-import { getClient as esClient, adjustQuery, getTotals, getHits } from '@storefront-api/lib/elastic-es7'
+import { getClient as esClient, adjustQuery, getTotals, getHits } from '@storefront-api/lib/elastic'
 
 export default ({ config }: ExtensionAPIFunctionParameter): Router => {
   const api = Router()
