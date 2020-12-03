@@ -33,8 +33,8 @@ export default ({ config }: ExtensionAPIFunctionParameter): Router => {
     switch (serviceName) {
       case 'storyblok':
         await storyblokConnector.fetch({ type, uid, lang, key })
-          .then(response => {
-            cacheResult(config, response, reqHash, cacheTags)
+          .then(async response => {
+            await cacheResult(config, response, reqHash, cacheTags)
             return apiStatus(res, response, 200)
           })
           .catch(error => apiStatus(res, error.message, 500))
@@ -66,8 +66,8 @@ export default ({ config }: ExtensionAPIFunctionParameter): Router => {
     switch (serviceName) {
       case 'storyblok':
         await storyblokConnector.search({ type, q, lang, fields })
-          .then(response => {
-            cacheResult(config, response, reqHash, cacheTags)
+          .then(async response => {
+            await cacheResult(config, response, reqHash, cacheTags)
             return apiStatus(res, response, 200)
           })
           .catch(error => apiStatus(res, error.message, 500))
@@ -196,8 +196,8 @@ export default ({ config }: ExtensionAPIFunctionParameter): Router => {
     switch (serviceName) {
       case 'storyblok':
         await storyblokConnector.datasource({ code })
-          .then(response => {
-            cacheResult(config, response, reqHash, cacheTags)
+          .then(async response => {
+            await cacheResult(config, response, reqHash, cacheTags)
             return apiStatus(res, response, 200)
           })
           .catch(error => apiStatus(res, error.message, 500))

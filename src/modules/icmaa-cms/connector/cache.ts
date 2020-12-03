@@ -1,9 +1,9 @@
 import cache from '@storefront-api/lib/cache-instance'
 import { apiStatus } from '@storefront-api/lib/util'
 
-const cacheResult = (config: Record<string, any>, result: any, hash: string, tags: string[]): void => {
+const cacheResult = async (config: Record<string, any>, result: any, hash: string, tags: string[]): Promise<void> => {
   if (config.server.useOutputCache && cache) {
-    cache
+    await cache
       .set('api:' + hash, result, tags)
       .catch(err => {
         console.error(err)
