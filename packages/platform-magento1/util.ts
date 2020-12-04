@@ -1,4 +1,5 @@
 import config from 'config'
+import { Request } from 'express'
 import { getCurrentStoreCode } from '@storefront-api/lib/util'
 import Logger from '@storefront-api/lib/logger'
 
