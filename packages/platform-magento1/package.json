@@ -30,7 +30,7 @@
     "@storefront-api/platform-abstract": "^1.0.0-rc.3",
     "bodybuilder": "^2.2.21",
     "config": "^1.30.0",
-    "magento1-vsbridge-client": "github:DivanteLtd/magento1-vsbridge-client",
+    "magento1-vsbridge-client": "git+https://github.com/icmaa/magento1-vsbridge-client#master",
     "typescript": "3.9.*"
   },
   "devDependencies": {
