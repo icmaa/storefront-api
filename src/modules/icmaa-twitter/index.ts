@@ -33,7 +33,7 @@ module.exports = ({ config }: ExtensionAPIFunctionParameter): Router => {
 
       return apiStatus(res, 'User not found', 400)
     }).catch(err => {
-      return apiStatus(res, err.response.data, 400)
+      return apiStatus(res, err.response.data.error || err.response.data, 400)
     })
   })
 
