@@ -29,12 +29,14 @@ module.exports = ({ config }: ExtensionAPIFunctionParameter): Router => {
     }
 
     if (ip) {
-      const redis = Redis(config, 'form-' + name)
-      if (await redis.get(ip)) {
+      const redisTagCache = Redis(config, `form-${name}`)
+      if (await redisTagCache.get(ip)) {
         apiStatus(res, 'Your IP has already been used.', 500)
+        redisTagCache.redis.quit()
         return
       }
-      await redis.set(ip, true, [])
+      await redisTagCache.set(ip, true, [])
+      redisTagCache.redis.quit()
     }
 
     const userData = req.body

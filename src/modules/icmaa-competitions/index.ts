@@ -20,10 +20,11 @@ module.exports = ({ config }: ExtensionAPIFunctionParameter): Router => {
       delete form.recaptcha
     }
 
-    const redis = Redis(config, 'form-' + spreadsheetId)
+    const redisTagCache = Redis(config, `form-${spreadsheetId}`)
     if (form.ip) {
-      if (await redis.get(form.ip)) {
+      if (await redisTagCache.get(form.ip)) {
         apiStatus(res, 'Your IP has already been used.', 500)
+        redisTagCache.redis.quit()
         return
       }
     }
@@ -61,13 +62,16 @@ module.exports = ({ config }: ExtensionAPIFunctionParameter): Router => {
       })
       .then(async () => {
         if (form.ip) {
-          await redis.set(form.ip, true, [])
+          await redisTagCache.set(form.ip, true, [])
         }
 
         apiStatus(res, 'true', 200)
       })
       .catch(err => {
         apiStatus(res, err.message, 500)
+      })
+      .finally(() => {
+        redisTagCache.redis.quit()
       })
   })
 
