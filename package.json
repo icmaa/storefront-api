@@ -24,7 +24,6 @@
     "docs:build": "vuepress build docs",
     "docs:deploy": "yarn docs:build && now --prod docs",
     "start": "pm2 start ecosystem.json $PM2_ARGS",
-    "prestart": "npm run -s build",
     "db7": "cross-env TS_NODE_PROJECT=\"tsconfig.json\" && ts-node -r tsconfig-paths/register scripts/db7.ts",
     "cache": "cross-env TS_NODE_PROJECT=\"tsconfig.json\" && ts-node -r tsconfig-paths/register ./scripts/cache",
     "mage2vs": "cross-env TS_NODE_PROJECT=\"tsconfig.json\" && ts-node -r tsconfig-paths/register scripts/mage2vs.ts",
