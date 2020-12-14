@@ -5,6 +5,12 @@
   "author": "cewald <c.ewald@impericon.com> and contributors",
   "license": "MIT",
   "private": true,
+  "files": [
+    "**/*.d.ts",
+    "*.d.ts",
+    "**/*.js",
+    "*.js"
+  ],
   "dependencies": {
     "@types/qs": "^6.9.1",
     "marked": "^1.1.1",

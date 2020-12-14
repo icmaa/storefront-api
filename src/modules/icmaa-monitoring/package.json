@@ -5,6 +5,12 @@
   "author": "cewald <c.ewald@impericon.com> and contributors",
   "license": "MIT",
   "private": true,
+  "files": [
+    "**/*.d.ts",
+    "*.d.ts",
+    "**/*.js",
+    "*.js"
+  ],
   "dependencies": {
     "dd-trace": "^0.20.3",
     "express-winston": "^4.0.3",

@@ -5,6 +5,12 @@
   "author": "cewald <c.ewald@impericon.com> and contributors",
   "license": "MIT",
   "private": true,
+  "files": [
+    "**/*.d.ts",
+    "*.d.ts",
+    "**/*.js",
+    "*.js"
+  ],
   "dependencies": {
     "jwt-simple": "^0.5.1",
     "nodemailer": "^4.6.8"

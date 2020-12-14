@@ -4,5 +4,11 @@
   "main": "index.js",
   "author": "cewald <c.ewald@impericon.com> and contributors",
   "license": "MIT",
-  "private": true
+  "private": true,
+  "files": [
+    "**/*.d.ts",
+    "*.d.ts",
+    "**/*.js",
+    "*.js"
+  ]
 }
