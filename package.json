@@ -41,7 +41,7 @@
     "o2m-auth": "cross-env TS_NODE_PROJECT=\"tsconfig.json\" && ts-node -r tsconfig-paths/register  packages/default-vsf/worker/order_to_magento2.ts testAuth",
     "o2m-dev": "nodemon -w packages/default-vsf/worker/order_to_magento2.ts --exec \"cross-env TS_NODE_PROJECT=\"tsconfig.json\" && ts-node -r tsconfig-paths/register  packages/default-vsf/worker/order_to_magento2.ts\"",
     "migrate": "node node_modules/migrate/bin/migrate",
-    "test": "eslint src",
+    "test": "npm run test:unit && npm run test:integration && npm run lint && npm run lint-gql",
     "test:unit": "NODE_ENV=test jest -c test/unit/jest.conf.js",
     "test:unit:watch": "NODE_ENV=test jest -c test/unit/jest.conf.js --watch",
     "test:integration": "NODE_ENV=test jest -c test/integration/jest.conf.js",

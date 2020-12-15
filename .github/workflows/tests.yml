@@ -17,9 +17,11 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: ${{ matrix.node-version }}
-      - name: yarn lint
+      - name: Run existing tests and linting
         run: |
           yarn
+          yarn test:unit
           yarn lint
+          yarn lint-gql
         env:
           CI: true
