@@ -27,7 +27,7 @@ if (config.get('extensions.icmaa-monitoring.datadog.enabled') === true) {
   })
 
   process.on('unhandledRejection', (error: any) => {
-    logger.error(`Unhandled promise rejection`, error)
+    logger.error('Unhandled promise rejection', error)
     console.error(`Unhandled promise rejection: ${error.message}`, error.stack || error)
   })
 }

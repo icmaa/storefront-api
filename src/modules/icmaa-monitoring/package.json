@@ -1,7 +1,6 @@
 {
   "name": "icmaa-monitoring",
   "version": "1.0.0",
-  "main": "build/index.js",
   "author": "cewald <c.ewald@impericon.com> and contributors",
   "license": "MIT",
   "private": true,
