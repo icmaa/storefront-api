@@ -46,7 +46,7 @@ export default ({ config }: ExtensionAPIFunctionParameter): Router => {
 
   api.get('/search', async (req, res) => {
     const { url, query } = req
-    const { type, q, lang, fields } = query
+    const { type, q, lang, fields, page, size, sort } = query
     if (type === undefined || q === undefined) {
       return apiStatus(res, '"q" and "type" are mandatory in request url', 500)
     }
@@ -65,7 +65,7 @@ export default ({ config }: ExtensionAPIFunctionParameter): Router => {
     const serviceName = config.get<string>('extensions.icmaaCms.service');
     switch (serviceName) {
       case 'storyblok':
-        await storyblokConnector.search({ type, q, lang, fields })
+        await storyblokConnector.search({ type, q, lang, fields, page, size, sort })
           .then(async response => {
             await cacheResult(config, response, reqHash, cacheTags)
             return apiStatus(res, response, 200)
