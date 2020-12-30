@@ -1,7 +1,7 @@
 {
   "name": "icmaa-cms",
   "version": "1.0.0",
-  "main": "index.ts",
+  "main": "index.js",
   "author": "cewald <c.ewald@impericon.com> and contributors",
   "license": "MIT",
   "private": true,
