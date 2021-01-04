@@ -42,23 +42,24 @@ module.exports = ({ config }: ExtensionAPIFunctionParameter): Router => {
     const userData = req.body
     if (!userData.token) {
       apiStatus(res, 'Email is not authorized!', 500)
+      return
     }
 
     const currentTime = getCurrentTimestamp()
     const tokenTime = jwt.decode(userData.token, config.get<string>('extensions.mailService.secretString'))
     if (currentTime - tokenTime > tokenLimit) {
-      apiStatus(res, 'Token has expired ', 500)
+      apiStatus(res, 'Token expired ', 500)
+      return
     }
 
     const { host, port, secure, user, pass } = config.get<Record<string, any>>('extensions.mailService.transport')
     if (!host || !port || !user || !pass) {
       apiStatus(res, 'No transport is defined for mail service!', 500)
-    }
-    if (!userData.sourceAddress) {
+      return
+    } else if (!userData.sourceAddress) {
       apiStatus(res, 'Source email address is not provided!', 500)
       return
-    }
-    if (!userData.targetAddress) {
+    } else if (!userData.targetAddress) {
       apiStatus(res, 'Target email address is not provided!', 500)
       return
     }
@@ -83,15 +84,15 @@ module.exports = ({ config }: ExtensionAPIFunctionParameter): Router => {
       html
     }
 
-    transporter.sendMail(mailOptions, (error) => {
-      if (error) {
-        apiStatus(res, error, 500)
+    transporter.sendMail(mailOptions, err => {
+      if (err) {
+        apiStatus(res, err, 500)
         return
       }
 
-      apiStatus(res, 'OK', 200)
-
       transporter.close()
+
+      apiStatus(res, 'OK', 200)
     })
   })
 
