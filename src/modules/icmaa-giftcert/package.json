@@ -1,0 +1,14 @@
+{
+  "name": "icmaa-giftcert",
+  "version": "1.0.0",
+  "main": "index.js",
+  "author": "cewald <cewald@impericon.com> and contributors",
+  "license": "MIT",
+  "private": true,
+  "files": [
+    "**/*.d.ts",
+    "*.d.ts",
+    "**/*.js",
+    "*.js"
+  ]
+}

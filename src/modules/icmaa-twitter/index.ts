@@ -1,0 +1,41 @@
+import { Router } from 'express'
+import { apiStatus } from '@storefront-api/lib/util'
+import { ExtensionAPIFunctionParameter } from '@storefront-api/lib/module'
+
+import Axios from 'axios'
+
+module.exports = ({ config }: ExtensionAPIFunctionParameter): Router => {
+  const api = Router()
+
+  api.get('/feed/:name/:count?', async (req, res) => {
+    const { name, count } = req.params
+    const { consumerKey, consumerSecret } = config.get<Record<string, any>>('extensions.icmaaTwitter')
+
+    const apiTokenUrl = 'https://api.twitter.com/oauth2/token'
+
+    const accessToken = await Axios.post(apiTokenUrl, null, {
+      params: { grant_type: 'client_credentials' },
+      auth: { username: consumerKey, password: consumerSecret }
+    })
+      .then(response => response.data.access_token)
+      .catch(() => {
+        return apiStatus(res, 'Couldn\'t fetch access-token', 400)
+      })
+
+    const apiUrl = 'https://api.twitter.com/1.1'
+    return Axios.get(apiUrl + '/statuses/user_timeline.json', {
+      headers: { Authorization: `Bearer ${accessToken}` },
+      params: { screen_name: name, count: count || 5 }
+    }).then(response => {
+      if (response.data.length > 0) {
+        return apiStatus(res, { items: response.data }, 200)
+      }
+
+      return apiStatus(res, 'User not found', 400)
+    }).catch(err => {
+      return apiStatus(res, err.response.data.error || err.response.data, 400)
+    })
+  })
+
+  return api
+}

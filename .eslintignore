@@ -1,4 +1,7 @@
 dist/
 node_modules
+**/*.d.ts
+packages/**/*.js
 src/modules/sample-api
 src/modules/template-module
+src/modules/icmaa*/**/*.js

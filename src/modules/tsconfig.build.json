@@ -1,0 +1,20 @@
+{
+  "references": [
+    { "path": "./icmaa" },
+    { "path": "./icmaa-cms" },
+    { "path": "./icmaa-competitions" },
+    { "path": "./icmaa-facebook" },
+    { "path": "./icmaa-giftcert" },
+    { "path": "./icmaa-mailer" },
+    { "path": "./icmaa-monitoring" },
+    { "path": "./icmaa-newsletter" },
+    { "path": "./icmaa-product-alert" },
+    { "path": "./icmaa-review" },
+    { "path": "./icmaa-spotify" },
+    { "path": "./icmaa-tracking" },
+    { "path": "./icmaa-twitter" },
+    { "path": "./icmaa-user" }
+  ],
+  "files": [],
+  "include": []
+}
