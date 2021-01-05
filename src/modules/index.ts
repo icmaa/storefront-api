@@ -1,22 +1,22 @@
 import { DefaultVuestorefrontApiModule } from '@storefront-api/default-vsf'
 import { DefaultCatalogModule } from '@storefront-api/default-catalog'
 import { DefaultImgModule } from '@storefront-api/default-img'
-import { SampleApiModule } from './sample-api'
-import { TemplateModule } from './template-module'
+import { IcmaaMonitoringModule } from 'icmaa-monitoring'
+import { IcmaaModule } from 'icmaa'
 import { StorefrontApiModule } from '@storefront-api/lib/module'
-import * as magento2 from '@storefront-api/platform-magento2'
+import * as magento1 from '@storefront-api/platform-magento1'
 
 export const modules: StorefrontApiModule[] = [
+  IcmaaMonitoringModule,
   DefaultVuestorefrontApiModule({
     platform: {
-      name: 'magento2',
-      platformImplementation: magento2
+      name: 'magento1',
+      platformImplementation: magento1
     }
   }),
   DefaultCatalogModule(),
   DefaultImgModule(),
-  SampleApiModule,
-  TemplateModule
+  IcmaaModule
 ]
 
 export default modules

@@ -1,4 +1,5 @@
 import config from 'config'
+import { Request } from 'express'
 import { getCurrentStoreCode } from '@storefront-api/lib/util'
 import Logger from '@storefront-api/lib/logger'
 
@@ -7,7 +8,7 @@ import Logger from '@storefront-api/lib/logger'
  * @param Object config configuration
  * @param Express request req
  */
-export function multiStoreConfig (apiConfig, req) {
+export function multiStoreConfig (apiConfig, req: Request): Record<string, any> {
   let confCopy = Object.assign({}, apiConfig)
   const storeCode = getCurrentStoreCode(req)
   const availableStores = config.get<string[]>('availableStores')
@@ -16,7 +17,7 @@ export function multiStoreConfig (apiConfig, req) {
     if (magento1Config['api_' + storeCode]) {
       confCopy = Object.assign({}, magento1Config['api_' + storeCode]) // we're to use the specific api configuration - maybe even separate magento instance
     } else {
-      if (new RegExp('/(' + availableStores.join('|') + ')/', 'gm').exec(confCopy.url) === null) {
+      if (new RegExp('/(' + config.get<string[]>('availableStores').join('|') + ')/', 'gm').exec(confCopy.url) === null) {
         confCopy.url = (confCopy.url).replace(/(vsbridge)/gm, `${storeCode}/$1`);
       }
     }

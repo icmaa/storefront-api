@@ -1,0 +1,27 @@
+name: Continuous Integration
+
+on:
+  pull_request:
+    types: [ opened, reopened, synchronize ]
+
+jobs:
+
+  test-lint:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [13.x]
+    steps:
+      - uses: actions/checkout@v2
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+      - name: Run existing tests and linting
+        run: |
+          yarn
+          yarn test:unit
+          yarn lint
+          yarn lint-gql
+        env:
+          CI: true

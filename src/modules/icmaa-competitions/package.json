@@ -1,0 +1,17 @@
+{
+  "name": "icmaa-competitions",
+  "version": "1.0.0",
+  "main": "index.js",
+  "author": "cewald <c.ewald@impericon.com> and contributors",
+  "license": "MIT",
+  "private": true,
+  "files": [
+    "**/*.d.ts",
+    "*.d.ts",
+    "**/*.js",
+    "*.js"
+  ],
+  "dependencies": {
+    "googleapis": "^45.0.0"
+  }
+}
