@@ -11,6 +11,7 @@ export async function aggregationsToAttributes (response: { aggregations: any, a
   is_user_defined: any,
   is_comparable: any,
   attribute_code: any,
+  position: any,
   slug: any,
   options: any
 }[]

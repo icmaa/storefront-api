@@ -158,6 +158,7 @@ function transformToMetadata ({
   is_user_defined,
   is_comparable,
   attribute_code,
+  position,
   slug,
   options = []
 }): any {
@@ -171,6 +172,7 @@ function transformToMetadata ({
     is_user_defined,
     is_comparable,
     attribute_code,
+    position,
     slug,
     options
   }
