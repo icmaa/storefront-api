@@ -17,6 +17,7 @@ interface CreateAttributeOptionArrayParams {
 
 class StoryblokConnector {
   protected lang
+  protected loadAllItems: boolean
 
   public api () {
     return {
@@ -168,10 +169,27 @@ class StoryblokConnector {
     return this.searchRequest({ queryObject, type, fields, page, size, sort })
   }
 
-  public async searchRequest ({ queryObject, type, results = [], fields, page = 1, size = 25, sort }) {
+  /**
+   * Return a query-based search against Storyblok.
+   *
+   * If you add no page it will load all items in 25 items/step (thats the default Storyblok limit).
+   * If you add a size and a page it will return the specific page limited by the size.
+   * If you only add a size it will load the the first page with the entered size.
+   */
+  public async searchRequest ({ queryObject, type, results = [], fields, page, size, sort }) {
     const sort_by = sort ? { sort_by: sort } : {}
+
+    if (!page) {
+      this.loadAllItems = (!size)
+      page = 1
+    }
+
+    if (!size) {
+      size = 25
+    }
+
     return this.api().get('cdn/stories', {
-      page: page || 1,
+      page,
       per_page: size,
       starts_with: this.lang ? `${this.lang}/*` : '',
       filter_query_v2: {
@@ -195,7 +213,12 @@ class StoryblokConnector {
       }
 
       results = [].concat(results, stories)
-      if (stories.length < size || page !== undefined) {
+      if (stories.length < size && this.loadAllItems) {
+        return results
+      } else if (!this.loadAllItems) {
+        if (results.length > size) {
+          results.splice(size)
+        }
         return results
       }
 
