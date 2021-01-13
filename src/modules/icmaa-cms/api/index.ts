@@ -105,7 +105,7 @@ export default ({ config }: ExtensionAPIFunctionParameter): Router => {
       if (options) {
         if (req.query.noneValue) {
           options.unshift({
-            name: 'None',
+            label: 'None',
             value: req.query.noneValue,
             sort_order: 0
           })
