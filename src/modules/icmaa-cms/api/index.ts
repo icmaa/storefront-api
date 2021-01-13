@@ -103,6 +103,14 @@ export default ({ config }: ExtensionAPIFunctionParameter): Router => {
         .reduce((a, b) => a.concat(b._source.options || []), [])
 
       if (options) {
+        if (req.query.noneValue) {
+          options.unshift({
+            label: 'None',
+            value: req.query.noneValue,
+            sort_order: 0
+          })
+        }
+
         switch (req.query.style) {
           case 'storyblok': {
             const { nameKey, valueKey, sortKey } = req.query
