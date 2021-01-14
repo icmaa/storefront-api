@@ -30,6 +30,13 @@ class StoryblokConnector {
           cv: cv || await this.api().cv()
         }
 
+        if (config.has('extensions.icmaaCms.storyblok.version')) {
+          const version = config.get<'published'|'draft'>('extensions.icmaaCms.storyblok.version')
+          if (version) {
+            merge(defaults, { version })
+          }
+        }
+
         const querystring: string = '?' + qs.stringify(
           merge(defaults, params),
           { encodeValuesOnly: true, arrayFormat: 'brackets' }
