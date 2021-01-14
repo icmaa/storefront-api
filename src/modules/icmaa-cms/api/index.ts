@@ -13,7 +13,7 @@ export default ({ config }: ExtensionAPIFunctionParameter): Router => {
 
   api.get('/by-uid', async (req, res) => {
     const { url, query } = req
-    const { type, uid, lang, key } = query
+    const { type, uid, lang, key, release } = query
     if (type === undefined || uid === undefined) {
       return apiStatus(res, '"uid" and "type" are mandatory in request url', 500)
     }
@@ -32,7 +32,9 @@ export default ({ config }: ExtensionAPIFunctionParameter): Router => {
     const serviceName = config.get<string>('extensions.icmaaCms.service');
     switch (serviceName) {
       case 'storyblok':
-        await storyblokConnector.fetch({ type, uid, lang, key })
+        await storyblokConnector
+          .setRelease(release as string)
+          .fetch({ type, uid, lang, key })
           .then(async response => {
             await cacheResult(config, response, reqHash, cacheTags)
             return apiStatus(res, response, 200)
@@ -46,7 +48,7 @@ export default ({ config }: ExtensionAPIFunctionParameter): Router => {
 
   api.get('/search', async (req, res) => {
     const { url, query } = req
-    const { type, q, lang, fields, page, size, sort } = query
+    const { type, q, lang, fields, page, size, sort, release } = query
     if (type === undefined || q === undefined) {
       return apiStatus(res, '"q" and "type" are mandatory in request url', 500)
     }
@@ -65,7 +67,9 @@ export default ({ config }: ExtensionAPIFunctionParameter): Router => {
     const serviceName = config.get<string>('extensions.icmaaCms.service');
     switch (serviceName) {
       case 'storyblok':
-        await storyblokConnector.search({ type, q, lang, fields, page, size, sort })
+        await storyblokConnector
+          .setRelease(release as string)
+          .search({ type, q, lang, fields, page, size, sort })
           .then(async response => {
             await cacheResult(config, response, reqHash, cacheTags)
             return apiStatus(res, response, 200)

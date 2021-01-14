@@ -16,7 +16,8 @@ interface CreateAttributeOptionArrayParams {
 }
 
 class StoryblokConnector {
-  protected lang
+  protected lang: string|boolean
+  protected release: string
   protected loadAllItems: boolean
 
   public api () {
@@ -35,6 +36,10 @@ class StoryblokConnector {
           if (version) {
             merge(defaults, { version })
           }
+        }
+
+        if (this.release) {
+          merge(defaults, { from_release: this.release })
         }
 
         const querystring: string = '?' + qs.stringify(
@@ -85,6 +90,11 @@ class StoryblokConnector {
     lang = lang && !defaultLanguageCodes.includes(lang) ? lang.toLowerCase() : false
     this.lang = lang && config.get('icmaa.mandant') ? `${config.get('icmaa.mandant')}_${lang}` : lang
     return this.lang
+  }
+
+  public setRelease (release?: string) {
+    this.release = release
+    return this
   }
 
   public isJsonString (string) {
