@@ -16,7 +16,8 @@ interface CreateAttributeOptionArrayParams {
 }
 
 class StoryblokConnector {
-  protected lang
+  protected lang: string|boolean
+  protected release: string
   protected loadAllItems: boolean
 
   public api () {
@@ -28,6 +29,17 @@ class StoryblokConnector {
           // Storyblok needs a cache-version or will alwys serve uncached versions which leads to hit the limit quickly.
           // @see https://www.storyblok.com/docs/api/content-delivery#topics/cache-invalidation
           cv: cv || await this.api().cv()
+        }
+
+        if (config.has('extensions.icmaaCms.storyblok.version')) {
+          const version = config.get<'published'|'draft'>('extensions.icmaaCms.storyblok.version')
+          if (version) {
+            merge(defaults, { version })
+          }
+        }
+
+        if (this.release) {
+          merge(defaults, { from_release: this.release })
         }
 
         const querystring: string = '?' + qs.stringify(
@@ -78,6 +90,11 @@ class StoryblokConnector {
     lang = lang && !defaultLanguageCodes.includes(lang) ? lang.toLowerCase() : false
     this.lang = lang && config.get('icmaa.mandant') ? `${config.get('icmaa.mandant')}_${lang}` : lang
     return this.lang
+  }
+
+  public setRelease (release?: string) {
+    this.release = release
+    return this
   }
 
   public isJsonString (string) {
