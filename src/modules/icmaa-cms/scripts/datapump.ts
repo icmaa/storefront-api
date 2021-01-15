@@ -7,6 +7,7 @@ import storyblokConnector from 'icmaa-cms/connector/storyblok'
 import Logger from '@storefront-api/lib/logger'
 import * as es from '@storefront-api/lib/elastic'
 import { getCurrentStoreView } from '@storefront-api/lib/util'
+import asyncForEach from 'icmaa/helpers/asyncForEach'
 
 const db = es.getClient(config)
 
@@ -22,8 +23,9 @@ program
   .description('Import a specific type of data from Storyblok into ElasticSearch')
   .option('-l, --language [lang]', 'Language for the import', 'de')
   .option('-r, --release [release]', 'Storyblok release-id to use for import')
+  .option('-c, --chunk-size [release]', 'Size of bulk import chunks', '100')
   .action(async (type, options) => {
-    const { language: lang, release } = options
+    const { language: lang, release, chunkSize } = options
 
     const timestamp = Math.round(+new Date() / 1000)
     const storeViewConfig = getCurrentStoreView(lang)
@@ -48,18 +50,22 @@ program
     Logger.info(`   Found ${items.length} items`)
 
     Logger.info('** Write items into temporary index')
-    chunk(items, 100).forEach((chunk, i) => {
-      Logger.info(`  Write chunk #${i + 1}`)
+    await asyncForEach(chunk(items, chunkSize), (chunk, i) => {
+      Logger.info(`   Write chunk #${i + 1}/${chunkSize}`)
       const body = flatten(chunk.map(doc => [{ index: { _index: tempIndex } }, doc]))
-      db.bulk({ body })
+      return db.bulk({ body })
         .then(() => {
-          Logger.info('   Done')
+          Logger.info('     Done')
         })
         .catch(e => {
-          Logger.info('   Error: ' + e.message)
-          return 1
+          Logger.info('     Error: ' + e.message)
+          Logger.info(`** Delete temporary index: ${tempIndex}`)
+          return db.indices.delete({ index: tempIndex })
         })
     })
+
+    Logger.info(`** Create alias for temporary index: ${tempIndex} > ${originalIndex}`)
+    db.indices.putAlias({ index: tempIndex, name: originalIndex })
   })
 
 program.parse(process.argv)
