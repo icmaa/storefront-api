@@ -1,5 +1,6 @@
 import program from 'commander'
 import path from 'path'
+import { flatten, chunk } from 'lodash'
 
 import config from 'config'
 import storyblokConnector from 'icmaa-cms/connector/storyblok'
@@ -44,18 +45,21 @@ program
 
     Logger.info(`** Load all "${type}" items from Storyblok for "${lang}" `)
     const items = await fetchItemsFromStoryblok({ type, lang, release })
-    Logger.info('   Done')
+    Logger.info(`   Found ${items.length} items`)
 
     Logger.info('** Write items into temporary index')
-    const body = items.map(doc => [{ index: { _index: 'vue_storefront_catalog_de_teaser_1610709457' } }, doc])
-    db.bulk({ refresh: true, body })
-      .then(resp => {
-        Logger.info('   Result: ' + resp)
-      })
-      .catch(e => {
-        Logger.info('   Error: ' + e.message)
-        console.error(e)
-      })
+    chunk(items, 100).forEach((chunk, i) => {
+      Logger.info(`  Write chunk #${i + 1}`)
+      const body = flatten(chunk.map(doc => [{ index: { _index: tempIndex } }, doc]))
+      db.bulk({ body })
+        .then(() => {
+          Logger.info('   Done')
+        })
+        .catch(e => {
+          Logger.info('   Error: ' + e.message)
+          return 1
+        })
+    })
   })
 
 program.parse(process.argv)

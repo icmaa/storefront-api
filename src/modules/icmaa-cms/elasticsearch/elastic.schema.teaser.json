@@ -1,17 +1,52 @@
 {
-    "properties": {
-        "id": {
-            "type": "integer"
-        },
-        "attribute_id": {
-            "type": "integer"
-        },
-        "options": {
-            "properties": {
-                "value": {
-                    "type": "text"
-                }
-            }
+  "properties": {
+    "storyId": {
+      "type": "integer"
+    },
+    "uid": {
+      "type": "text"
+    },
+    "uuid": {
+      "type": "text"
+    },
+    "uname": {
+      "type": "text"
+    },
+    "component": {
+      "type": "text"
+    },
+    "showFrom": {
+      "type": "date",
+      "format": "yyyy-MM-dd HH:mm:ss||yyyy-MM-dd"
+    },
+    "showTo": {
+      "type": "date",
+      "format": "yyyy-MM-dd HH:mm:ss||yyyy-MM-dd"
+    },
+    "createdAt": {
+      "type": "date",
+      "format": "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'||yyyy-MM-dd HH:mm:ss||yyyy-MM-dd"
+    },
+    "publishedAt": {
+      "type": "date",
+      "format": "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'||yyyy-MM-dd HH:mm:ss||yyyy-MM-dd"
+    },
+    "firstPublishedAt": {
+      "type": "date",
+      "format": "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'||yyyy-MM-dd HH:mm:ss||yyyy-MM-dd"
+    },
+    "order": {
+      "type": "integer"
+    },
+    "gender": {
+      "type": "text"
+    },
+    "tags": {
+      "properties": {
+        "value": {
+          "type": "text"
         }
+      }
     }
+  }
 }
