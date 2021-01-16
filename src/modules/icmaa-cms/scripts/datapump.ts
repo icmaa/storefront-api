@@ -52,7 +52,7 @@ program
     Logger.info('** Write items into temporary index')
     await asyncForEach(chunk(items, chunkSize), (chunk, i) => {
       Logger.info(`   Write chunk #${i + 1}/${chunkSize}`)
-      const body = flatten(chunk.map(doc => [{ index: { _index: tempIndex } }, doc]))
+      const body = flatten(chunk.map(doc => [{ index: { _index: tempIndex, _id: doc.uid } }, doc]))
       return db.bulk({ body })
         .then(() => {
           Logger.info('     Done')
