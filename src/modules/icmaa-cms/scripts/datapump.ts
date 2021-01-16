@@ -74,6 +74,7 @@ program
       .then(resp => resp.body.filter(a => a.index !== tempIndex))
       .then(oldAliases => db.indices.delete({ index: oldAliases.map(a => a.index) }))
       .then(() => Logger.info('   Done'))
+      .catch(e => Logger.info(`   Error: ${e.message}`))
   })
 
 program.parse(process.argv)

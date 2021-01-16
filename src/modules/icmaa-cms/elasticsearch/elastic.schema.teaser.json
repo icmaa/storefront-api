@@ -39,7 +39,8 @@
       "type": "integer"
     },
     "gender": {
-      "type": "text"
+      "type": "keyword",
+      "null_value": "NULL"
     },
     "tags": {
       "properties": {
