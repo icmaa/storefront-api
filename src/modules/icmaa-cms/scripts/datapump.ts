@@ -27,6 +27,10 @@ program
   .action(async (type, options) => {
     const { language: lang, release, chunkSize } = options
 
+    Logger.info(`** Load all "${type}" items from Storyblok for "${lang}" `)
+    const items = await fetchItemsFromStoryblok({ type, lang, release })
+    Logger.info(`   Found ${items.length} items`)
+
     const timestamp = Math.round(+new Date() / 1000)
     const storeViewConfig = getCurrentStoreView(lang)
     const indexName = storeViewConfig.elasticsearch.index
@@ -45,10 +49,6 @@ program
       body: indexSchema
     }).then(() => Logger.info('   Done'))
 
-    Logger.info(`** Load all "${type}" items from Storyblok for "${lang}" `)
-    const items = await fetchItemsFromStoryblok({ type, lang, release })
-    Logger.info(`   Found ${items.length} items`)
-
     Logger.info('** Write items into temporary index')
     await asyncForEach(chunk(items, chunkSize), (chunk, i) => {
       Logger.info(`   Write chunk #${i + 1}/${chunkSize}`)
@@ -65,7 +65,15 @@ program
     })
 
     Logger.info(`** Create alias for temporary index: ${tempIndex} > ${originalIndex}`)
-    db.indices.putAlias({ index: tempIndex, name: originalIndex })
+    await db.indices.putAlias({ index: tempIndex, name: originalIndex })
+      .then(() => Logger.info('   Done'))
+
+    // Remove old indices and aliases
+    Logger.info('** Remove old indices and aliases')
+    await db.cat.aliases({ name: originalIndex, format: 'json' })
+      .then(resp => resp.body.filter(a => a.index !== tempIndex))
+      .then(oldAliases => db.indices.delete({ index: oldAliases.map(a => a.index) }))
+      .then(() => Logger.info('   Done'))
   })
 
 program.parse(process.argv)
