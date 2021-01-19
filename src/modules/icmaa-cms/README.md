@@ -48,3 +48,20 @@ This API extension get data from headless cms of choice.
 /api/ext/icmaa-cms/search?type=block&lang=de-de&q={"identifier":%20{"in":%20"navigation-meta,navigation-main"}}
 /api/icmaa-cms/search?type=block&lang=de-de&q={"identifier":%20{"in":%20"navigation-meta,navigation-main"}}
 ```
+
+## Scripts
+
+### `datapump teaser -l de`
+
+This script does pump all data of a specific content-type from Storyblok into an ElasticSearch index.
+
+It fetches the data like it would be fetched by the `/search` endpoint and formats it so the data-format is the same as we fetch it from the ES.
+
+The Storyblok query-language is pretty limited so this would be able to make more complex queries against CMS data.
+
+```bash
+# From workspace root:
+yarn workspace icmaa-cms datapump import teaser -l de
+# From module directory
+yarn datapump import teaser -l de
+```

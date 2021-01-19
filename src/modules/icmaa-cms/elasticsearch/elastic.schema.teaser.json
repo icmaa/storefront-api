@@ -1,0 +1,53 @@
+{
+  "properties": {
+    "storyId": {
+      "type": "integer"
+    },
+    "uid": {
+      "type": "text"
+    },
+    "uuid": {
+      "type": "text"
+    },
+    "uname": {
+      "type": "text"
+    },
+    "component": {
+      "type": "text"
+    },
+    "showFrom": {
+      "type": "date",
+      "format": "yyyy-MM-dd HH:mm||yyyy-MM-dd HH:mm:ss||yyyy-MM-dd"
+    },
+    "showTo": {
+      "type": "date",
+      "format": "yyyy-MM-dd HH:mm||yyyy-MM-dd HH:mm:ss||yyyy-MM-dd"
+    },
+    "createdAt": {
+      "type": "date",
+      "format": "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'||yyyy-MM-dd HH:mm:ss||yyyy-MM-dd"
+    },
+    "publishedAt": {
+      "type": "date",
+      "format": "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'||yyyy-MM-dd HH:mm:ss||yyyy-MM-dd"
+    },
+    "firstPublishedAt": {
+      "type": "date",
+      "format": "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'||yyyy-MM-dd HH:mm:ss||yyyy-MM-dd"
+    },
+    "order": {
+      "type": "integer"
+    },
+    "gender": {
+      "type": "keyword",
+      "null_value": "NULL"
+    },
+    "tags": {
+      "properties": {
+        "value": {
+          "type": "text"
+        }
+      }
+    }
+  }
+}

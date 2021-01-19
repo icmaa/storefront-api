@@ -124,10 +124,21 @@ class StoryblokConnector {
   public async fetch ({ type, uid, lang, key }) {
     let request: Promise<any>
     const fetchById = (key && key === 'id')
+    const fetchByUuid = (key && key === 'uuid')
 
     this.matchLanguage(lang)
 
-    if (!fetchById) {
+    if (fetchById) {
+      request = this.api().get(
+        `cdn/stories/${uid}`,
+        { language: this.lang ? this.lang : undefined }
+      )
+    } else if (fetchByUuid) {
+      request = this.api().get(
+        'cdn/stories',
+        { by_uuids: uid, language: this.lang ? this.lang : undefined }
+      )
+    } else {
       let query: any = { [this.getKey(key)]: { in: uid } }
       if (key && key.startsWith('i18n_')) {
         query = {
@@ -146,11 +157,6 @@ class StoryblokConnector {
           ...query
         }
       })
-    } else {
-      request = this.api().get(
-        `cdn/stories/${uid}`,
-        { language: this.lang ? this.lang : undefined }
-      )
     }
 
     return request
