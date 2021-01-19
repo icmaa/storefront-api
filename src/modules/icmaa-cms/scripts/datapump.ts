@@ -50,18 +50,18 @@ program
     }).then(() => Logger.info('   Done'))
 
     Logger.info('** Write items into temporary index')
-    await asyncForEach(chunk(items, chunkSize), (chunk, i) => {
-      Logger.info(`   Write chunk #${i + 1}/${chunkSize}`)
-      const body = flatten(chunk.map(doc => [{ index: { _index: tempIndex, _id: doc.uid } }, doc]))
+    const chunks = chunk(items, chunkSize)
+    await asyncForEach(chunks, (chunk, i) => {
+      Logger.info(`   Write chunk #${i + 1}/${chunks.length}`)
+      const body = flatten(chunk.map(doc => [{ index: { _index: tempIndex, _id: doc.uuid } }, doc]))
       return db.bulk({ body })
         .then(() => {
           Logger.info('     Done')
         })
-        .catch(e => {
-          Logger.info('     Error: ' + e.message)
-          Logger.info(`** Delete temporary index: ${tempIndex}`)
-          return db.indices.delete({ index: tempIndex })
-        })
+    }).catch(e => {
+      Logger.info('     Error: ' + e.message)
+      db.indices.delete({ index: tempIndex })
+      return false
     })
 
     Logger.info(`** Create alias for temporary index: ${tempIndex} > ${originalIndex}`)

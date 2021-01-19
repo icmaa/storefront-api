@@ -17,11 +17,11 @@
     },
     "showFrom": {
       "type": "date",
-      "format": "yyyy-MM-dd HH:mm:ss||yyyy-MM-dd"
+      "format": "yyyy-MM-dd HH:mm||yyyy-MM-dd HH:mm:ss||yyyy-MM-dd"
     },
     "showTo": {
       "type": "date",
-      "format": "yyyy-MM-dd HH:mm:ss||yyyy-MM-dd"
+      "format": "yyyy-MM-dd HH:mm||yyyy-MM-dd HH:mm:ss||yyyy-MM-dd"
     },
     "createdAt": {
       "type": "date",
