@@ -24,9 +24,6 @@ jobs:
         with:
           node-version: '13.x'
 
-      - name: Install
-        uses: bahmutov/npm-install@v1
-
       - name: Get repository name, and branch name
         run: |
           echo "APP=$(echo ${GITHUB_REPOSITORY##*/})" >> $GITHUB_ENV
@@ -39,8 +36,11 @@ jobs:
       - name: Checkout "icmaa/shop-workspace" repo
         run: |
           rm -rf shop-workspace
-          CONFIG_BRANCH=$(if [ "${{ env.BRANCH_NAME }}" -ne "master" ]; then echo "-b develop"; fi)
-          git clone --no-tags --depth 1 https://${{ secrets.GITHUB_PAT }}@github.com/icmaa/shop-workspace ${{ CONFIG_BRANCH }}
+          export CONFIG_BRANCH=$(if [ "${{ github.ref }}" != "master" ]; then echo "-b develop"; fi)
+          git clone --no-tags --depth 1 https://${{ secrets.GITHUB_PAT }}@github.com/icmaa/shop-workspace $CONFIG_BRANCH
+      
+      - name: Install
+        uses: bahmutov/npm-install@v1
 
       - name: Sync config JSON files
         run: rsync -r ./shop-workspace/template/${{ env.APP }}/ ./
