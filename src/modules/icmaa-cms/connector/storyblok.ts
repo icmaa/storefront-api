@@ -16,7 +16,8 @@ interface CreateAttributeOptionArrayParams {
 }
 
 class StoryblokConnector {
-  protected lang
+  protected lang: string|boolean
+  protected release: string
   protected loadAllItems: boolean
 
   public api () {
@@ -28,6 +29,17 @@ class StoryblokConnector {
           // Storyblok needs a cache-version or will alwys serve uncached versions which leads to hit the limit quickly.
           // @see https://www.storyblok.com/docs/api/content-delivery#topics/cache-invalidation
           cv: cv || await this.api().cv()
+        }
+
+        if (config.has('extensions.icmaaCms.storyblok.version')) {
+          const version = config.get<'published'|'draft'>('extensions.icmaaCms.storyblok.version')
+          if (version) {
+            merge(defaults, { version })
+          }
+        }
+
+        if (this.release) {
+          merge(defaults, { from_release: this.release })
         }
 
         const querystring: string = '?' + qs.stringify(
@@ -80,6 +92,11 @@ class StoryblokConnector {
     return this.lang
   }
 
+  public setRelease (release?: string) {
+    this.release = release
+    return this
+  }
+
   public isJsonString (string) {
     try {
       const query = JSON.parse(string)
@@ -107,10 +124,21 @@ class StoryblokConnector {
   public async fetch ({ type, uid, lang, key }) {
     let request: Promise<any>
     const fetchById = (key && key === 'id')
+    const fetchByUuid = (key && key === 'uuid')
 
     this.matchLanguage(lang)
 
-    if (!fetchById) {
+    if (fetchById) {
+      request = this.api().get(
+        `cdn/stories/${uid}`,
+        { language: this.lang ? this.lang : undefined }
+      )
+    } else if (fetchByUuid) {
+      request = this.api().get(
+        'cdn/stories',
+        { by_uuids: uid, language: this.lang ? this.lang : undefined }
+      )
+    } else {
       let query: any = { [this.getKey(key)]: { in: uid } }
       if (key && key.startsWith('i18n_')) {
         query = {
@@ -129,11 +157,6 @@ class StoryblokConnector {
           ...query
         }
       })
-    } else {
-      request = this.api().get(
-        `cdn/stories/${uid}`,
-        { language: this.lang ? this.lang : undefined }
-      )
     }
 
     return request
