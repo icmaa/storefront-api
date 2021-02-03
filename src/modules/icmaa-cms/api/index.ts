@@ -5,7 +5,7 @@ import { sha3_224 } from 'js-sha3'
 import { Router } from 'express'
 
 import storyblokConnector from '../connector/storyblok'
-import { cacheResult, cacheHandler } from '../connector/cache'
+import { cacheResult, cacheHandler, getCvByRequest } from '../connector/cache'
 import { getClient as esClient, adjustQuery, getTotals, getHits } from '@storefront-api/lib/elastic'
 
 export default ({ config }: ExtensionAPIFunctionParameter): Router => {
@@ -29,12 +29,14 @@ export default ({ config }: ExtensionAPIFunctionParameter): Router => {
       return
     }
 
+    const cv = getCvByRequest(req)
+
     const serviceName = config.get<string>('extensions.icmaaCms.service');
     switch (serviceName) {
       case 'storyblok':
         await storyblokConnector
           .setRelease(release as string)
-          .fetch({ type, uid, lang, key })
+          .fetch({ type, uid, lang, key, cv })
           .then(async response => {
             await cacheResult(config, response, reqHash, cacheTags)
             return apiStatus(res, response, 200)
@@ -64,12 +66,14 @@ export default ({ config }: ExtensionAPIFunctionParameter): Router => {
       return
     }
 
+    const cv = getCvByRequest(req)
+
     const serviceName = config.get<string>('extensions.icmaaCms.service');
     switch (serviceName) {
       case 'storyblok':
         await storyblokConnector
           .setRelease(release as string)
-          .search({ type, q, lang, fields, page, size, sort })
+          .search({ type, q, lang, fields, page, size, sort, cv })
           .then(async response => {
             await cacheResult(config, response, reqHash, cacheTags)
             return apiStatus(res, response, 200)
