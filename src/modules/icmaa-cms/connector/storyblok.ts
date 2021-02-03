@@ -28,7 +28,7 @@ class StoryblokConnector {
           token: config.get('extensions.icmaaCms.storyblok.accessToken'),
           // Storyblok needs a cache-version or will alwys serve uncached versions which leads to hit the limit quickly.
           // @see https://www.storyblok.com/docs/api/content-delivery#topics/cache-invalidation
-          cv: cv || await this.api().cv()
+          cv: await this.api().cv(cv)
         }
 
         if (config.has('extensions.icmaaCms.storyblok.version')) {
@@ -60,21 +60,26 @@ class StoryblokConnector {
             return {}
           })
       },
-      cv: async (): Promise<string> => {
+      cv: async function (cv?: string): Promise<string> {
+        if (cv === 'justnow') {
+          return undefined
+        }
+
         const cacheKey = 'storyblokCacheVersion'
         if (!config.get('server.useOutputCache') || !cache || !cache.get) {
           return Date.now().toString()
         }
 
         return cache.get(cacheKey).then(output => {
-          if (output !== null) {
+          if (!cv && output !== null) {
             return output.toString()
           }
-          return this.api()
+          return this
             .get('cdn/spaces/me', {}, 'justnow')
             .then(resp => {
               const cv = resp.space.version.toString()
-              return cache.set(cacheKey, cv, ['cms', 'cms-cacheversion'])
+              return cache
+                .set(cacheKey, cv, ['cms', 'cms-cacheversion'])
                 .then(() => cv)
             })
         }).catch(e => {
@@ -121,7 +126,7 @@ class StoryblokConnector {
     return (key.startsWith('i18n_')) ? key.slice(5) + '__i18n__' + this.lang : key
   }
 
-  public async fetch ({ type, uid, lang, key }) {
+  public async fetch ({ type, uid, lang, key, cv }) {
     let request: Promise<any>
     const fetchById = (key && key === 'id')
     const fetchByUuid = (key && key === 'uuid')
@@ -131,12 +136,14 @@ class StoryblokConnector {
     if (fetchById) {
       request = this.api().get(
         `cdn/stories/${uid}`,
-        { language: this.lang ? this.lang : undefined }
+        { language: this.lang ? this.lang : undefined },
+        cv
       )
     } else if (fetchByUuid) {
       request = this.api().get(
         'cdn/stories',
-        { by_uuids: uid, language: this.lang ? this.lang : undefined }
+        { by_uuids: uid, language: this.lang ? this.lang : undefined },
+        cv
       )
     } else {
       let query: any = { [this.getKey(key)]: { in: uid } }
@@ -156,7 +163,7 @@ class StoryblokConnector {
           component: { in: type },
           ...query
         }
-      })
+      }, cv)
     }
 
     return request
@@ -176,7 +183,7 @@ class StoryblokConnector {
       })
   }
 
-  public async search ({ type, q, lang, fields, page, size, sort }) {
+  public async search ({ type, q, lang, fields, page, size, sort, cv }) {
     this.matchLanguage(lang)
 
     let queryObject: any = { identifier: { in: q } }
@@ -189,7 +196,7 @@ class StoryblokConnector {
     if (size) size = parseInt(size)
     if (sort) sort = `content.${sort}`
 
-    return this.searchRequest({ queryObject, type, fields, page, size, sort })
+    return this.searchRequest({ queryObject, type, fields, page, size, sort, cv })
   }
 
   /**
@@ -199,7 +206,7 @@ class StoryblokConnector {
    * If you add a size and a page it will return the specific page limited by the size.
    * If you only add a size it will load the the first page with the entered size.
    */
-  public async searchRequest ({ queryObject, type, results = [], fields, page, size, sort }) {
+  public async searchRequest ({ queryObject, type, results = [], fields, page, size, sort, cv }) {
     const sort_by = sort ? { sort_by: sort } : {}
 
     if (!page) {
@@ -220,7 +227,7 @@ class StoryblokConnector {
         ...queryObject
       },
       ...sort_by
-    }).then(async response => {
+    }, cv).then(async response => {
       let stories = response.stories
         .map(story => extractStoryContent(story))
         .map(story => objectKeysToCamelCase(story))
@@ -245,7 +252,7 @@ class StoryblokConnector {
         return results
       }
 
-      return this.searchRequest({ queryObject, type, results, fields, page: page + 1, size, sort })
+      return this.searchRequest({ queryObject, type, results, fields, page: page + 1, size, sort, cv })
     }).catch(e => {
       console.error('Error during parsing:', e)
       return []
