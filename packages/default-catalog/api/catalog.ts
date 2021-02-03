@@ -63,12 +63,6 @@ export default ({ config }: ExtensionAPIFunctionParameter) => async function (re
     }
   }
 
-  if (req.query.request_format === 'search-query') { // search query and not Elastic DSL - we need to translate it
-    const customFilters = await loadCustomFilters(config)
-    requestBody = await elasticsearch.buildQueryBodyFromSearchQuery({ config: config as ElasticsearchQueryConfig, queryChain: bodybuilder(), searchQuery: new SearchQuery(requestBody), customFilters })
-  }
-  if (req.query.response_format) responseFormat = req.query.response_format as string
-
   const urlSegments = req.url.split('/')
 
   let indexName = ''
@@ -86,6 +80,22 @@ export default ({ config }: ExtensionAPIFunctionParameter) => async function (re
       throw new Error('Please do use following URL format: /api/catalog/<index_name>/_search')
     }
   }
+
+  if (req.query.request_format === 'search-query') { // search query and not Elastic DSL - we need to translate it
+    const customFilters = await loadCustomFilters(config)
+    if (entityType !== '') {
+      Object.assign(customFilters, await loadCustomFilters(config, entityType))
+    }
+
+    requestBody = await elasticsearch.buildQueryBodyFromSearchQuery({
+      config: config as ElasticsearchQueryConfig,
+      queryChain: bodybuilder(),
+      searchQuery: new SearchQuery(requestBody),
+      customFilters
+    })
+  }
+
+  if (req.query.response_format) responseFormat = req.query.response_format as string
 
   // Decode token and get group id
   const userToken = requestBody.groupToken
