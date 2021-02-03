@@ -14,7 +14,7 @@ const db = es.getClient(config)
 const fetchItemsFromStoryblok = ({ type, lang, release }): Promise<any[]> => {
   return storyblokConnector
     .setRelease(release)
-    .search({ type, q: {}, lang, fields: undefined, page: undefined, size: undefined, sort: undefined })
+    .search({ type, q: {}, lang, fields: undefined, page: undefined, size: undefined, sort: undefined, cv: undefined })
     .then(resp => resp)
 }
 
