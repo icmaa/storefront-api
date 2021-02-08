@@ -1,5 +1,10 @@
 import cache from '@storefront-api/lib/cache-instance'
 import { apiStatus } from '@storefront-api/lib/util'
+import { Request } from 'express'
+
+const hasCacheHeader = (req: Request): boolean => !!req.header('X-VS-Cache-Bypass')
+
+const getCvByRequest = (req: Request): string|undefined => hasCacheHeader(req) ? 'flush-' + Date.now().toString() : undefined
 
 const cacheResult = async (config: Record<string, any>, result: any, hash: string, tags: string[]): Promise<void> => {
   if (config.server.useOutputCache && cache) {
@@ -11,8 +16,8 @@ const cacheResult = async (config: Record<string, any>, result: any, hash: strin
   }
 }
 
-const cacheHandler = async (config: Record<string, any>, res: Record<string, any>, hash: string, req: Record<string, any>): Promise<boolean|string> => {
-  if (!req.header('X-VS-Cache-Bypass') && config.server.useOutputCache && cache) {
+const cacheHandler = async (config: Record<string, any>, res: Record<string, any>, hash: string, req: Request): Promise<boolean|string> => {
+  if (!hasCacheHeader(req) && config.server.useOutputCache && cache) {
     return cache.get(
       'api:' + hash
     ).then(output => {
@@ -34,5 +39,6 @@ const cacheHandler = async (config: Record<string, any>, res: Record<string, any
 
 export {
   cacheResult,
-  cacheHandler
+  cacheHandler,
+  getCvByRequest
 }
