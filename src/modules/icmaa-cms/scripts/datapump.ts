@@ -3,7 +3,7 @@ import path from 'path'
 import { flatten, chunk } from 'lodash'
 
 import config from 'config'
-import storyblokConnector from 'icmaa-cms/connector/storyblok'
+import StoryblokConnector from 'icmaa-cms/connector/storyblok'
 import Logger from '@storefront-api/lib/logger'
 import * as es from '@storefront-api/lib/elastic'
 import { getCurrentStoreView } from '@storefront-api/lib/util'
@@ -12,7 +12,7 @@ import asyncForEach from 'icmaa/helpers/asyncForEach'
 const db = es.getClient(config)
 
 const fetchItemsFromStoryblok = ({ type, lang, release }): Promise<any[]> => {
-  return storyblokConnector
+  return new StoryblokConnector()
     .setRelease(release)
     .search({ type, q: {}, lang, fields: undefined, page: undefined, size: undefined, sort: undefined, cv: undefined })
     .then(resp => resp)
