@@ -4,7 +4,7 @@ import { apiStatus } from '@storefront-api/lib/util'
 import { sha3_224 } from 'js-sha3'
 import { Router } from 'express'
 
-import storyblokConnector from '../connector/storyblok'
+import StoryblokConnector from '../connector/storyblok'
 import { cacheResult, cacheHandler, getCvByRequest } from '../connector/cache'
 import { getClient as esClient, adjustQuery, getTotals, getHits } from '@storefront-api/lib/elastic'
 
@@ -34,7 +34,7 @@ export default ({ config }: ExtensionAPIFunctionParameter): Router => {
     const serviceName = config.get<string>('extensions.icmaaCms.service');
     switch (serviceName) {
       case 'storyblok':
-        await storyblokConnector
+        await new StoryblokConnector()
           .setRelease(release as string)
           .fetch({ type, uid, lang, key, cv })
           .then(async response => {
@@ -71,7 +71,7 @@ export default ({ config }: ExtensionAPIFunctionParameter): Router => {
     const serviceName = config.get<string>('extensions.icmaaCms.service');
     switch (serviceName) {
       case 'storyblok':
-        await storyblokConnector
+        await new StoryblokConnector()
           .setRelease(release as string)
           .search({ type, q, lang, fields, page, size, sort, cv })
           .then(async response => {
@@ -123,7 +123,7 @@ export default ({ config }: ExtensionAPIFunctionParameter): Router => {
           case 'storyblok': {
             const { nameKey, valueKey, sortKey } = req.query
             return res.status(200).json(
-              storyblokConnector.createAttributeOptionArray({
+              new StoryblokConnector().createAttributeOptionArray({
                 options,
                 nameKey: (nameKey as string),
                 valueKey: (valueKey as string),
@@ -175,7 +175,7 @@ export default ({ config }: ExtensionAPIFunctionParameter): Router => {
         switch (req.query.style) {
           case 'storyblok':
             return res.status(200).json(
-              storyblokConnector.createAttributeOptionArray({
+              new StoryblokConnector().createAttributeOptionArray({
                 options,
                 nameKey: c => `${c.name} (/${c.url_path})`,
                 valueKey: 'slug'
@@ -211,7 +211,7 @@ export default ({ config }: ExtensionAPIFunctionParameter): Router => {
     const serviceName = config.get<string>('extensions.icmaaCms.service')
     switch (serviceName) {
       case 'storyblok':
-        await storyblokConnector.datasource({ code })
+        await new StoryblokConnector().datasource({ code })
           .then(async response => {
             await cacheResult(config, response, reqHash, cacheTags)
             return apiStatus(res, response, 200)

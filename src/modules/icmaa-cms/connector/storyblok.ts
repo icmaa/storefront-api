@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
+
 import config from 'config'
 
 import qs from 'qs'
@@ -291,4 +293,4 @@ class StoryblokConnector {
   }
 }
 
-export default new StoryblokConnector()
+export default StoryblokConnector
