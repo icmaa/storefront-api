@@ -5,7 +5,7 @@ import winston from 'winston'
 if (config.get('extensions.icmaa-monitoring.datadog.enabled') === true) {
   // Init datadog tracing agent
   tracer.init({
-    service: 'vue-storefront-api',
+    service: 'storefront-api',
     env: config.get('icmaa.mandant') + '-' + config.get('icmaa.environment'),
     clientToken: process.env.DD_CLIENT_TOKEN || config.get('extensions.icmaa-monitoring.datadog.clientToken'),
     analytics: true,
