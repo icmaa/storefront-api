@@ -151,6 +151,7 @@ async function list (attributesParam: AttributeListParam, config: IConfig, index
 function transformToMetadata ({
   is_visible_on_front,
   is_visible,
+  frontend_label,
   default_frontend_label,
   attribute_id,
   entity_type_id,
@@ -165,6 +166,7 @@ function transformToMetadata ({
   return {
     is_visible_on_front,
     is_visible,
+    frontend_label,
     default_frontend_label,
     attribute_id,
     entity_type_id,
