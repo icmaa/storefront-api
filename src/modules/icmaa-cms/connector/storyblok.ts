@@ -124,6 +124,10 @@ class StoryblokConnector {
     }
   }
 
+  protected getComponentFilter (type: string, query: Record<string, any>): Record<string, any> {
+    return (type === 'all' && Object.keys(query).length > 0) ? {} : { component: { in: type } }
+  }
+
   public getKey (key = 'identifier'): string {
     return (key.startsWith('i18n_')) ? key.slice(5) + '__i18n__' + this.lang : key
   }
@@ -162,7 +166,7 @@ class StoryblokConnector {
       request = this.api().get('cdn/stories', {
         starts_with: this.lang ? `${this.lang}/*` : '',
         filter_query_v2: {
-          component: { in: type },
+          ...this.getComponentFilter(type, query),
           ...query
         }
       }, cv)
@@ -204,9 +208,9 @@ class StoryblokConnector {
   /**
    * Return a query-based search against Storyblok.
    *
-   * If you add no page it will load all items in 25 items/step (thats the default Storyblok limit).
+   * If you add no page or size it will load all items in 25 items/step (thats the default Storyblok limit).
    * If you add a size and a page it will return the specific page limited by the size.
-   * If you only add a size it will load the the first page with the entered size.
+   * If you only add a size it will load the first page with the entered size.
    */
   public async searchRequest ({ queryObject, type, results = [], fields, page, size, sort, cv }) {
     const sort_by = sort ? { sort_by: sort } : {}
@@ -225,7 +229,7 @@ class StoryblokConnector {
       per_page: size,
       starts_with: this.lang ? `${this.lang}/*` : '',
       filter_query_v2: {
-        component: { in: type },
+        ...this.getComponentFilter(type, queryObject),
         ...queryObject
       },
       ...sort_by
