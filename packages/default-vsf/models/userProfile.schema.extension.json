@@ -45,6 +45,12 @@
                   "string"
                 ]
               },
+              "region": {
+                  "type": ["string", "null"]
+              },
+              "region_id": {
+                "type": ["string", "null"]
+              },
               "telephone": {
                 "type": [
                   "number",
