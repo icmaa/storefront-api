@@ -41,7 +41,7 @@ export const extractPluginValues = async <T>(object: Record<string, any>): Promi
 
     if (/(rte|markdown)$/.test(key)) {
       object[key] = await import('marked')
-        .then(m => m.default(object[key]))
+        .then(m => m.default(object[key], { gfm: true, breaks: true }))
         .catch(e => {
           console.error('Error during Markdown parsing in value mapping:', e)
           return ''
