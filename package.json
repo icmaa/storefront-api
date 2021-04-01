@@ -104,6 +104,7 @@
     "icmaa-tracking": "*",
     "icmaa-twitter": "*",
     "icmaa-user": "*",
+    "icmaa-wishlist": "*",
     "js-sha3": "^0.8.0",
     "jsonfile": "^4.0.0",
     "jwa": "^1.1.5",
