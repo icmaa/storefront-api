@@ -13,7 +13,8 @@
     { "path": "./icmaa-spotify" },
     { "path": "./icmaa-tracking" },
     { "path": "./icmaa-twitter" },
-    { "path": "./icmaa-user" }
+    { "path": "./icmaa-user" },
+    { "path": "./icmaa-wishlist" }
   ],
   "files": [],
   "include": []
