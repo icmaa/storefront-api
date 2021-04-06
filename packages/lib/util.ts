@@ -1,18 +1,7 @@
 import config from 'config'
-import crypto from 'crypto'
-import fs from 'fs'
+import { Cipher, Decipher, createCipheriv, createDecipheriv, randomBytes } from 'crypto'
 
 const algorithm = 'aes-256-ctr'
-const iv = ((buildFilePath = '../config/build.json', ivLength = 16): string | Buffer => {
-  if (!config.get<boolean>('cipherIVByBuildTime')) return 'XXXXXXXXXXXXXXXX'
-  const buildFile = fs.existsSync(buildFilePath) && fs.readFileSync(buildFilePath, 'utf8')
-  if (buildFile) {
-    const build: { time: string|number } = JSON.parse(buildFile)
-    const buildHash = crypto.createHash('md5').update(`${build.time}`, 'utf8').digest('hex')
-    return buildHash.slice(0, ivLength)
-  }
-  return crypto.randomBytes(ivLength)
-})()
 
 /**
  * Get current store code from parameter passed from the vue storefront frotnend app
@@ -111,29 +100,44 @@ export function apiError (res, error: Record<any, any>): string|Record<any, any>
 }
 
 /**
- *  Encrypt a token string using `aes-256-ctr` algorithm
+ * Encrypt a token string using `aes-256-ctr` algorithm
  *
- *  @param {string} textToken
- *  @param {secret} string Needs to be a 16 bit/32 glyphs sized string to fit the `aes-256-ctr` requirements
- *  @return {string}
+ * @param {string} textToken
+ * @param {string} secret Needs to be a 16 bit/32 glyphs sized string to fit the `aes-256-ctr` requirements
+ * @return {string}
  */
 export function encryptToken (textToken: string, secret: string): string {
-  const cipher = crypto.createCipheriv(algorithm, secret, iv)
-  let crypted = cipher.update(textToken, 'utf8', 'hex')
+  const iv: Buffer = randomBytes(16)
+  const cipher: Cipher = createCipheriv(algorithm, secret, iv)
+
+  let crypted: string = cipher.update(textToken, 'utf8', 'hex')
   crypted += cipher.final('hex')
-  return crypted
+
+  const payload: { [key: string]: string } = {
+    data: crypted,
+    iv: iv.toString('hex')
+  }
+
+  const resultBuffer: Buffer = Buffer.from(JSON.stringify(payload));
+
+  return resultBuffer.toString('hex')
 }
 
 /**
- *  Decrypt a token string using `aes-256-ctr` algorithm
+ * Decrypt a token string using `aes-256-ctr` algorithm
  *
- *  @param {string} textToken
- *  @param {secret} string Needs to be a 16 bit/32 glyphs sized string to fit the `aes-256-ctr` requirements
- *  @return {string}
+ * @param {string} textToken
+ * @param {string} secret Needs to be a 16 bit/32 glyphs sized string to fit the `aes-256-ctr` requirements
+ * @return {string}
  */
 export function decryptToken (textToken: string, secret: string): string {
-  const decipher = crypto.createDecipheriv(algorithm, secret, iv)
-  let decrypted = decipher.update(textToken, 'hex', 'utf8')
+  const dataBuffer: Buffer = Buffer.from(textToken, 'hex')
+  const payload: { [key: string]: string } = JSON.parse(dataBuffer.toString('ascii'))
+  const ivBuffer: Buffer = Buffer.from(payload.iv, 'hex')
+  const decipher: Decipher = createDecipheriv(algorithm, secret, ivBuffer)
+
+  let decrypted: string = decipher.update(payload.data, 'hex', 'utf8')
   decrypted += decipher.final('utf8')
+
   return decrypted
 }
