@@ -19,7 +19,6 @@
     "build:copy:schema": "cpx 'src/**/*.schema*.json' dist/src",
     "build:modules": "tsc --build ./src/modules/tsconfig.build.json",
     "prebuild:modules": "rimraf \"src/modules/icmaa*/**/*.{d.ts,js}\"",
-    "build:time": "ts-node scripts/buildtime.ts",
     "build:clean": "yarn prebuild:modules && yarn prebuild:packages",
     "docs:dev": "vuepress dev docs --port 8090",
     "docs:build": "vuepress build docs",
