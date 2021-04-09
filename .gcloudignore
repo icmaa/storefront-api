@@ -1,0 +1,12 @@
+.gcloudignore
+.git
+.github
+.gitignore
+node_modules/
+docker/
+kubernetes/
+integration-sdk/
+migrations/
+docs/
+test/
+var/
