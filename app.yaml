@@ -10,3 +10,5 @@ env_variables:
 instance_class: F4
 automatic_scaling:
   max_instances: 2
+vpc_access_connector:
+  name: 'projects/icmaashopimptest01/locations/europe-west1/connectors/icmaa-vsf-test'
