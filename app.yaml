@@ -1,7 +1,3 @@
-# This is WIP
-# @todo: Connect to an redis instance:
-# https://cloud.google.com/memorystore/docs/redis/connect-redis-instance-standard
-
 runtime: nodejs14
 service: storefront-api
 entrypoint: cross-env VSF_BIND_PORT=$PORT node dist/src/index.js
@@ -9,10 +5,10 @@ env_variables:
   NODE_APP_INSTANCE: imp
   NODE_CONFIG_ENV: test
   VSF_BIND_HOST: 0.0.0.0
-  VSF_REDIS_HOST: 10.84.35.35
+  VSF_REDIS_HOST: 10.89.160.19
   VSF_REDIS_PORT: 6379
 instance_class: F4
 automatic_scaling:
   max_instances: 2
 vpc_access_connector:
-  name: 'projects/icmaashopimptest01/locations/europe-west1/connectors/icmaa-vsf-test'
+  name: 'projects/analog-decoder-310812/locations/us-central1/connectors/icmaa-vsf-poc'
