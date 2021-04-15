@@ -1,3 +1,7 @@
+# This is WIP
+# @todo: Connect to an redis instance:
+# https://cloud.google.com/memorystore/docs/redis/connect-redis-instance-standard
+
 runtime: nodejs14
 service: storefront-api
 entrypoint: cross-env VSF_BIND_PORT=$PORT node dist/src/index.js
