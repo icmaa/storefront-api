@@ -5,8 +5,6 @@ env_variables:
   NODE_APP_INSTANCE: imp
   NODE_CONFIG_ENV: gae
   VSF_BIND_HOST: 0.0.0.0
-  VSF_REDIS_HOST: 10.253.121.203
-  VSF_REDIS_PORT: 6379
 instance_class: F4
 automatic_scaling:
   max_instances: 2
