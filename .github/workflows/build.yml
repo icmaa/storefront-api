@@ -61,3 +61,4 @@ jobs:
         with:
           credentials: ${{ secrets.GCP_VSF_SA_KEY }}
           project_id: ${{ secrets.GCP_VSF_PROJECT_ID }}
+          version: ${{ env.BRANCH_NAME }}-${{ GITHUB_SHA }}
