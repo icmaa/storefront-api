@@ -7,6 +7,7 @@ on:
       - develop
       - develop-*
       - build/*
+      - gcloud/*
 
 jobs:
 
@@ -52,20 +53,11 @@ jobs:
         timeout-minutes: 15
         run: yarn build
         env:
-          NODE_CONFIG_ENV: ${{ env.ENV }}
+          NODE_CONFIG_ENV: gae
           NODE_APP_INSTANCE: ${{ matrix.env.MANDANT }}
 
-      - name: Zip build
-        run: |
-          mkdir builds
-          zip -r builds/${{ env.APP }}-${{ matrix.env.MANDANT }}-${{ env.ENV }}-latest.zip $(cat .build-files)
-          cp builds/${{ env.APP }}-${{ matrix.env.MANDANT }}-${{ env.ENV }}-latest.zip builds/${{ env.APP }}-${{ matrix.env.MANDANT }}-${{ env.ENV }}-$(date '+%Y%m%d-%H%M%S').zip
-
-      - name: Upload binary to S3 bucket
-        uses: jakejarvis/s3-sync-action@master
-        env:
-          SOURCE_DIR: builds/
-          AWS_REGION: 'us-east-1'
-          AWS_S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      - id: deploy
+        uses: google-github-actions/deploy-appengine@main
+        with:
+          credentials: ${{ secrets.GCP_VSF_SA_KEY }}
+          project_id: ${{ secrets.GCP_VSF_PROJECT_ID }}
