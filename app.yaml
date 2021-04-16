@@ -5,10 +5,10 @@ env_variables:
   NODE_APP_INSTANCE: imp
   NODE_CONFIG_ENV: test
   VSF_BIND_HOST: 0.0.0.0
-  VSF_REDIS_HOST: 10.89.160.19
+  VSF_REDIS_HOST: 10.253.121.203
   VSF_REDIS_PORT: 6379
 instance_class: F4
 automatic_scaling:
   max_instances: 2
 vpc_access_connector:
-  name: 'projects/analog-decoder-310812/locations/us-central1/connectors/icmaa-vsf-poc'
+  name: 'projects/icmaa-vsf-poc-02/locations/europe-west1/connectors/icmaa-vsf-poc-02'
