@@ -29,7 +29,7 @@ jobs:
         run: |
           echo "APP=$(echo ${GITHUB_REPOSITORY##*/})" >> $GITHUB_ENV
           echo "BRANCH_NAME=$(echo ${GITHUB_REF#refs/heads/})" >> $GITHUB_ENV
-          echo "VERSION_BASE_NAME=$(echo ${BRANCH_NAME} | sed -e 's/[^a-zA-Z0-9]/-/g')" >> $GITHUB_ENV
+          echo "VERSION_BASE_NAME=$(echo ${GITHUB_REF#refs/heads/} | sed -e 's/[^a-zA-Z0-9]/-/g')" >> $GITHUB_ENV
 
       - name: Get environment by branch
         run: |
