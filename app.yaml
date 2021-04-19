@@ -9,4 +9,4 @@ instance_class: F4
 automatic_scaling:
   max_instances: 2
 vpc_access_connector:
-  name: 'projects/icmaa-vsf-poc-02/locations/europe-west1/connectors/icmaa-vsf-poc-02'
+  name: 'projects/icmaashopimptest02/locations/europe-west3/connectors/icmaa-vsf-test'
