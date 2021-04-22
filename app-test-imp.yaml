@@ -3,7 +3,7 @@ service: storefront-api
 entrypoint: cross-env VSF_BIND_PORT=$PORT node dist/src/index.js
 env_variables:
   NODE_APP_INSTANCE: imp
-  NODE_CONFIG_ENV: gae
+  NODE_CONFIG_ENV: test
   VSF_BIND_HOST: 0.0.0.0
 instance_class: F2
 automatic_scaling:
