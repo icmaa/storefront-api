@@ -10,6 +10,6 @@ export const IcmaaModule: StorefrontApiModule = new StorefrontApiModule({
     const registeredExtensions: string[] = config.get('modules.icmaa.registeredExtensions')
     registerExtensions({ app, config, db, registeredExtensions, rootPath })
 
-    app.get('/_ah/warmup', (req, res) => res.send('Success'))
+    app.get('/_ah/warmup', (req, res) => res.send('Warm-Up for storefront-api'))
   }
 })
