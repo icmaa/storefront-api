@@ -6,7 +6,6 @@
     { "path": "./icmaa-facebook" },
     { "path": "./icmaa-giftcert" },
     { "path": "./icmaa-mailer" },
-    { "path": "./icmaa-monitoring" },
     { "path": "./icmaa-newsletter" },
     { "path": "./icmaa-product-alert" },
     { "path": "./icmaa-review" },
