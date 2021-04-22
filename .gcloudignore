@@ -1,7 +1,14 @@
 .gcloudignore
-.git
-.github
-.gitignore
+.git*
+.editorconfig
+.env
+.eslint*
+.lintstagedrc.js
+.huskyrc.js
+docker-compose.yml
+nodemon.json
+LICENSE
+*.md
 node_modules/
 docker/
 kubernetes/
