@@ -59,7 +59,7 @@ jobs:
       - id: deploy
         uses: google-github-actions/deploy-appengine@main
         with:
-          deliverables: app-${{ env.ENV == 'production' && 'prod-' || 'test-' }}${{ matrix.env.MANDANT }}.yaml
+          deliverables: app-${{ matrix.env.MANDANT }}-${{ env.ENV == 'production' && 'prod' || 'test' }}.yaml
           credentials: ${{ secrets.GCP_VSF_SA_KEY }}
           project_id: ${{ secrets.GCP_VSF_PROJECT_ID }}
           version: ${{ env.VERSION_NAME }}

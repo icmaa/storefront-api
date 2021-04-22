@@ -1,0 +1,14 @@
+runtime: nodejs14
+service: storefront-api
+entrypoint: cross-env VSF_BIND_PORT=$PORT node dist/src/index.js
+env_variables:
+  NODE_APP_INSTANCE: imp
+  NODE_CONFIG_ENV: test
+  VSF_BIND_HOST: 0.0.0.0
+instance_class: F2
+automatic_scaling:
+  max_instances: 4
+vpc_access_connector:
+  name: 'projects/icmaa-shop-imp-test-01/locations/europe-west3/connectors/icmaa-vsf-test'
+inbound_services:
+  - warmup
