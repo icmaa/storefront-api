@@ -7,10 +7,13 @@ env_variables:
   VSF_BIND_HOST: 0.0.0.0
 instance_class: F2
 automatic_scaling:
-  min_idle_instances: 1
-  min_instances: 1
-  max_instances: 4
+  min_idle_instances: 0
+  max_idle_instances: 5
+  min_instances: 0
+  max_instances: 10
   max_concurrent_requests: 80
+  min_pending_latency: 500ms
+  max_pending_latency: 4000ms
 vpc_access_connector:
   name: 'projects/icmaa-shop-imp-test-01/locations/europe-west3/connectors/default'
 inbound_services:
