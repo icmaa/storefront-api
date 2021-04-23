@@ -7,7 +7,10 @@ env_variables:
   VSF_BIND_HOST: 0.0.0.0
 instance_class: F2
 automatic_scaling:
+  min_instances: 1
+  min_idle_instances: 1
   max_instances: 4
+  max_concurrent_requests: 50
 vpc_access_connector:
   name: 'projects/icmaa-shop-imp-test-01/locations/europe-west3/connectors/default'
 inbound_services:
