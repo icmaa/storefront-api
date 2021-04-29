@@ -5,6 +5,7 @@ env_variables:
   NODE_APP_INSTANCE: imp
   NODE_CONFIG_ENV: test
   VSF_BIND_HOST: 0.0.0.0
+  GCLOUD_OPERATIONS_ENABLED: true
 instance_class: F2
 automatic_scaling:
   target_cpu_utilization: 0.65

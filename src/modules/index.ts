@@ -1,3 +1,5 @@
+import 'icmaa-logs/lib/gcloud'
+
 import { DefaultVuestorefrontApiModule } from '@storefront-api/default-vsf'
 import { DefaultCatalogModule } from '@storefront-api/default-catalog'
 import { DefaultImgModule } from '@storefront-api/default-img'
