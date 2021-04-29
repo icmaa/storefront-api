@@ -7,10 +7,7 @@ if (
 ) {
   require('@google-cloud/trace-agent').start()
   require('@google-cloud/profiler').start()
-  require('@google-cloud/debug-agent').start({
-    appPathRelativeToRepository: '../../',
-    javascriptFileExtensions: ['.js', '.ts']
-  })
+  // require('@google-cloud/debug-agent').start()
 
   console.log('Enable Google Cloud Operations libraries')
 }
