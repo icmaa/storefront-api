@@ -1,0 +1,21 @@
+runtime: nodejs14
+service: storefront-api
+entrypoint: cross-env VSF_BIND_PORT=$PORT node dist/src/index.js
+env_variables:
+  NODE_APP_INSTANCE: imp
+  NODE_CONFIG_ENV: production
+  VSF_BIND_HOST: 0.0.0.0
+  GCLOUD_OPERATIONS_ENABLED: true
+instance_class: F2
+automatic_scaling:
+  min_instances: 1
+  max_instances: 20
+  min_idle_instances: 2
+  max_idle_instances: 5
+  max_concurrent_requests: 80
+  min_pending_latency: 150ms
+  target_throughput_utilization: 0.75
+vpc_access_connector:
+  name: 'projects/icmaa-shop-imp-prod-01/locations/europe-west3/connectors/default-large'
+inbound_services:
+  - warmup
