@@ -14,10 +14,17 @@ export const newMagentoClientAction = (moduleName = '', endpoint = '', urlPrefix
     const module = {};
     module[endpoint] = function (reqData) {
       let url = urlPrefix + endpoint + query
+
       const token = req.query.token
       if (token) {
         url += `?token=${token}`
       }
+
+      const cartId = req.query.cartId
+      if (cartId) {
+        url += `?cartId=${cartId}`
+      }
+
       return restClient[req.method.toLowerCase()](url, reqData, token)
         .then(data => {
           return data.code === 200 ? data.result : false
