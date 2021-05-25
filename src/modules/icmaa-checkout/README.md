@@ -8,9 +8,11 @@ This API extension gets extendend checkout & quote information from a custom `vs
    `"registeredExtensions": ["icmaa-checkout", …],`
 2. Add the new endpoint to the VSF in `local.json` to:
    ```
-   "checkout": {
-     "endpoint": "/api/icmaa-checkout/agreements",
-   }
+   "icmaa_checkout": {
+     "endpoints": {
+        "agreements": "/api/icmaa-checkout/agreements"
+     }
+   },
    ```
 
 ## API endpoints
