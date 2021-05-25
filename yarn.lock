@@ -11016,14 +11016,6 @@ macos-release@^2.2.0:
     request "^2.88.0"
     sha1 "^1.1.1"
 
-"magento1-vsbridge-client@git+https://github.com/icmaa/magento1-vsbridge-client#master":
-  version "0.1.0"
-  resolved "git+https://github.com/icmaa/magento1-vsbridge-client#3431ae956c99c0e546b51772096e2720bfef1473"
-  dependencies:
-    oauth-1.0a "^1.0.1"
-    request "^2.72.0"
-    winston "^2.2.0"
-
 "magento2-rest-client@github:DivanteLtd/magento2-rest-client":
   version "0.0.13"
   resolved "https://codeload.github.com/DivanteLtd/magento2-rest-client/tar.gz/32632162060588c6f9e86eba47ad4544229307f2"
