@@ -1,6 +1,7 @@
 {
   "references": [
     { "path": "./icmaa" },
+    { "path": "./icmaa-checkout" },
     { "path": "./icmaa-cms" },
     { "path": "./icmaa-competitions" },
     { "path": "./icmaa-facebook" },
