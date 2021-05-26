@@ -2,7 +2,7 @@
 
 import config from 'config'
 
-import qs from 'qs'
+import qs from 'query-string'
 import fetch from 'node-fetch'
 import cache from '@storefront-api/lib/cache-instance'
 
@@ -46,7 +46,7 @@ class StoryblokConnector {
 
         const querystring: string = '?' + qs.stringify(
           merge(defaults, params),
-          { encodeValuesOnly: true, arrayFormat: 'brackets' }
+          { arrayFormat: 'bracket' }
         )
 
         return fetch(`${baseUrl}/${endpoint}${querystring}`)

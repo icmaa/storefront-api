@@ -2,7 +2,7 @@ import Axios from 'axios'
 import { Response } from 'express'
 import { IConfig } from 'config'
 
-const qs = require('qs')
+const qs = require('query-string')
 
 export default async (response: Response, config: IConfig): Promise<boolean|string> => {
   let recaptchaErrorMsg = 'Google reCAPTCHA is invalid'

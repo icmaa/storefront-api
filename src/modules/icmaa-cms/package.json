@@ -15,11 +15,10 @@
     "datapump": "export NODE_CONFIG_DIR='../../../config' && ts-node scripts/datapump.ts"
   },
   "dependencies": {
-    "@types/qs": "^6.9.1",
     "commander": "^6.2.1",
     "marked": "^1.1.1",
     "node-fetch": "^2.6.0",
-    "qs": "^6.9.1",
+    "query-string": "^7.0.0",
     "storyblok-js-client": "^2.0.0",
     "yaml": "^1.10.0"
   }
