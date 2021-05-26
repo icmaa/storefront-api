@@ -2,11 +2,18 @@ import pick from 'lodash/pick'
 import forEach from 'lodash/forEach'
 import config from 'config'
 import StoryblokClient from 'storyblok-js-client'
+// import marked from 'marked'
 
 const pluginMap: Record<string, any>[] = config.get('extensions.icmaaCms.storyblok.pluginFieldMap')
 const metaFieldsToTransport = [{ id: 'story_id' }, { name: 'uname' }, 'uuid', 'published_at', 'created_at', 'first_published_at']
 
 const getFieldMap = (key) => pluginMap.find(m => m.key === key)
+
+let staticMarked: any = false
+const marked = (string, options) => {
+  if (!staticMarked) staticMarked = require('marked/lib/marked.js')
+  return staticMarked(string, options)
+}
 
 export const extractPluginValues = async <T>(object: Record<string, any>): Promise<Record<string, any>> => {
   for (const key in object) {
@@ -40,12 +47,12 @@ export const extractPluginValues = async <T>(object: Record<string, any>): Promi
     }
 
     if (/(rte|markdown)$/.test(key)) {
-      object[key] = await import('marked')
-        .then(m => m.default(object[key], { gfm: true, breaks: true }))
-        .catch(e => {
-          console.error('Error during Markdown parsing in value mapping:', e)
-          return ''
-        })
+      try {
+        object[key] = marked(object[key], { gfm: true, breaks: true })
+      } catch (err) {
+        console.error('Error during Markdown parsing in value mapping:', err)
+        object[key] = ''
+      }
     }
   }
 
