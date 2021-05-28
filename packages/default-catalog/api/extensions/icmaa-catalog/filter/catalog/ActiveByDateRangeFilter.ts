@@ -1,5 +1,6 @@
 import config from 'config'
 import { FilterInterface } from 'storefront-query-builder'
+import moment from 'moment-timezone'
 import omit from 'lodash/omit'
 
 interface FilterDefaults { from: string, to: string, utcOffset: string }
@@ -14,9 +15,16 @@ const filter: FilterInterface = {
       value = {}
     }
 
-    const dateTime = value.dateTime || defaultFields.utcOffset
+    let dateTime = value.dateTime || defaultFields.utcOffset
     const fromField = value.fromField || defaultFields.from
     const toField = value.toField || defaultFields.to
+
+    // Get UTC offset from timezone using the dateTime parameter.
+    // We assume that times in the ES are always saved in UTC format so we can use the offset of the timezone.
+    if (!dateTime.startsWith('now') && !moment(new Date(dateTime), moment.ISO_8601).isValid()) {
+      const tzOffset = moment.tz(dateTime).utcOffset() / 60
+      dateTime = Math.sign(tzOffset) !== -1 ? `now+${tzOffset}h` : `now${tzOffset}h`
+    }
 
     value = omit(value, ['dateTime', 'fromField', 'toField'])
 
