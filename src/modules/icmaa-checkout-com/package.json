@@ -1,0 +1,14 @@
+{
+  "name": "icmaa-checkout-com",
+  "version": "1.0.0",
+  "main": "index.js",
+  "author": "Kristofers Ozolins <kristofers.ozolins@magebit.com> and contributors",
+  "license": "MIT",
+  "private": true,
+  "files": [
+    "**/*.d.ts",
+    "*.d.ts",
+    "**/*.js",
+    "*.js"
+  ]
+}
