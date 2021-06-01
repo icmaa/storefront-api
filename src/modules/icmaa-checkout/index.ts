@@ -6,19 +6,25 @@ import { newMagentoClientAction } from 'icmaa/helpers'
 module.exports = ({ config }: ExtensionAPIFunctionParameter): Router => {
   const api = Router()
 
-  const urlPrefix = 'cart/'
-
-  const action = (endpoint) => async (req, res) => {
-    const client = newMagentoClientAction('cart', endpoint, urlPrefix, config, req)
-    client.cart[endpoint](req.body)
+  api.get('/agreements', async (req, res) => {
+    const client = newMagentoClientAction('cart', 'agreements', 'cart/', config, req)
+    client.cart.agreements(req.body)
       .then((result) => {
         apiStatus(res, result, 200)
       }).catch(err => {
         apiStatus(res, err, 500)
       })
-  }
+  })
 
-  api.get('/agreements', action('agreements'))
+  api.post('/order', async (req, res) => {
+    const client = newMagentoClientAction('order', 'create', 'order/', config, req)
+    client.order.create(req.body)
+      .then((result) => {
+        apiStatus(res, result, 200)
+      }).catch(err => {
+        apiStatus(res, err, 500)
+      })
+  })
 
   return api
 }
