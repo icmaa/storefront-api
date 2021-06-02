@@ -126,7 +126,7 @@ module.exports.RestClient = function (options) {
     return apiCall(request_data, request_token);
   }
 
-  instance.delete = function (resourceUrl, request_token = '') {
+  instance.delete = function (resourceUrl, data, request_token = '') {
     const request_data = {
       url: createUrl(resourceUrl),
       method: 'DELETE',
