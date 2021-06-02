@@ -20,7 +20,11 @@ module.exports = ({ config }: ExtensionAPIFunctionParameter): Router => {
     createNewClientActionProxy(req, res, 'cart', 'shippingMethods', 'cart/')
   )
 
-  api.post('/sync-quote', async (req, res) =>
+  api.get('/quote', async (req, res) =>
+    createNewClientActionProxy(req, res, 'cart', 'totals', 'cart/')
+  )
+
+  api.post('/quote', async (req, res) =>
     createNewClientActionProxy(req, res, 'cart', 'totals', 'cart/')
   )
 
