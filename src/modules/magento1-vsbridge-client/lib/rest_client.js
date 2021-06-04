@@ -60,12 +60,19 @@ module.exports.RestClient = function (options) {
     });
     /* eslint no-undef: off */
     return new Promise((resolve, reject) => {
+      const jar = request.jar()
+      if (process.env.XDEBUG_SESSION) {
+        const xdebugCookie = request.cookie('XDEBUG_SESSION=' + process.env.XDEBUG_SESSION)
+        jar.setCookie(xdebugCookie, request_data.url)
+      }
+
       request({
         url: request_data.url,
         method: request_data.method,
         headers: request_token ? { Authorization: 'Bearer ' + request_token } : oauth.toHeader(oauth.authorize(request_data, token)),
         json: true,
-        body: request_data.body
+        body: request_data.body,
+        jar
       }, (error, response, body) => {
         logger.debug('Response received')
         if (error) {
