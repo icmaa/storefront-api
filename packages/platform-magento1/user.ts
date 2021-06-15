@@ -20,8 +20,8 @@ class UserProxy extends AbstractUserProxy {
     return this.api.user.me(customerToken)
   }
 
-  public orderHistory (customerToken, page, pageSize) {
-    return this.api.user.orderHistory(customerToken, page, pageSize)
+  public orderHistory (customerToken, pageSize, page) {
+    return this.api.user.orderHistory(customerToken, pageSize, page)
   }
 
   public creditValue (customerToken) {
