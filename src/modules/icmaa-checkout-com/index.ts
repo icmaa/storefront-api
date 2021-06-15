@@ -6,10 +6,9 @@ import { newMagentoClientAction } from 'icmaa/helpers'
 module.exports = ({ config }: ExtensionAPIFunctionParameter): Router => {
   const api = Router()
 
-  api.post('/payment-details', async (req, res) => {
-    const client = newMagentoClientAction('checkoutcom', 'details', 'checkoutcom/', config, req)
-    console.log(req.body)
-    client.checkoutcom.details(req.body)
+  api.get('/apm-list', async (req, res) => {
+    const client = newMagentoClientAction('checkoutcom', 'apmlist', 'checkoutcom/', config, req)
+    client.checkoutcom.apmlist(req.body)
       .then((result) => {
         apiStatus(res, result, 200)
       }).catch(err => {
