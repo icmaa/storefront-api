@@ -47,7 +47,7 @@ module.exports = function (restClient) {
     });
   }
   module.orderHistory = function (customerToken, page, pageSize) {
-    url += `orderHistory?token=${customerToken}`;
+    url += `orderHistory?token=${customerToken}&page=${page}&pageSize=${pageSize}`;
     return restClient.get(url, { page: page, pageSize: pageSize }).then((data) => {
       return getResponse(data);
     });
