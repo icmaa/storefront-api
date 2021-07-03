@@ -2,6 +2,7 @@ import { Request } from 'express'
 import { IConfig } from 'config'
 import { multiStoreConfig } from '@storefront-api/platform-magento1/util'
 import { Magento1Client as Magento1ClientType } from 'magento1-vsbridge-client'
+import qs from 'query-string'
 
 const Magento1Client = require('magento1-vsbridge-client').Magento1Client
 
@@ -14,10 +15,22 @@ export const newMagentoClientAction = (moduleName = '', endpoint = '', urlPrefix
     const module = {};
     module[endpoint] = function (reqData) {
       let url = urlPrefix + endpoint + query
+      let queryParams = {}
+
       const token = req.query.token
       if (token) {
-        url += `?token=${token}`
+        queryParams = Object.assign(queryParams, { token })
       }
+
+      const cartId = req.query.cartId
+      if (cartId) {
+        queryParams = Object.assign(queryParams, { cartId })
+      }
+
+      url = qs.stringifyUrl({
+        url, query: queryParams
+      })
+
       return restClient[req.method.toLowerCase()](url, reqData, token)
         .then(data => {
           return data.code === 200 ? data.result : false
