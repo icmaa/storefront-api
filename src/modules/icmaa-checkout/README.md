@@ -9,19 +9,20 @@ This API extension gets extendend checkout & quote information from a custom `vs
 2. Add the new endpoint to the VSF in `local.json` to:
    ```
    "icmaa_checkout": {
+     "endpoint": "/api/icmaa-checkout",
      "endpoints": {
-        "agreements": "/api/icmaa-checkout/agreements",
-        "quote": "/quote?token={{token}}&cartId={{cartId}}",
-        "shippingMethods": "/shipping-methods?token={{token}}&cartId={{cartId}}",
-        "order": "/order?token={{token}}&cartId={{cartId}}"
-     }
+       "quote": "/quote?token={{token}}&cartId={{cartId}}",
+       "shippingMethods": "/shipping-methods?token={{token}}&cartId={{cartId}}",
+       "order": "/order?token={{token}}&cartId={{cartId}}"
+     },
+     // ...
    },
    ```
 
 ## API endpoints
 ```
-/api/ext/icmaa-checkout/shipping-methods
-/api/ext/icmaa-checkout/quote
-/api/ext/icmaa-checkout/agreements
-/api/ext/icmaa-checkout/order
+/api/icmaa-checkout/shipping-methods
+/api/icmaa-checkout/quote
+/api/icmaa-checkout/agreements
+/api/icmaa-checkout/order
 ```
