@@ -12,6 +12,7 @@ This API extension gets and sends informations for PayPal payments to the VSBrig
       "endpoint": "/api/icmaa-paypal",
       "endpoints": {
          "bypass_start": "/bypass_start?token={{token}}&cartId={{cartId}}"
+         "bypass_shipping": "/bypass_shipping?token={{token}}&cartId={{cartId}}"
       }
    },
    ```
@@ -19,4 +20,5 @@ This API extension gets and sends informations for PayPal payments to the VSBrig
 ## API endpoints
 ```
 /api/icmaa-paypal/bypass_start
+/api/icmaa-paypal/bypass_shipping
 ```
