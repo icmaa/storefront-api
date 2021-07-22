@@ -24,5 +24,13 @@ module.exports = ({ config }: ExtensionAPIFunctionParameter): Router => {
     createNewClientActionProxy(req, res, 'icmaa-paypal', 'shipping', 'paypal_bypass/')
   )
 
+  api.post('/bypass_approve', async (req, res) =>
+    createNewClientActionProxy(req, res, 'icmaa-paypal', 'approve', 'paypal_bypass/')
+  )
+
+  api.post('/bypass_capture', async (req, res) =>
+    createNewClientActionProxy(req, res, 'icmaa-paypal', 'capture', 'paypal_bypass/')
+  )
+
   return api
 }
