@@ -16,20 +16,20 @@ module.exports = ({ config }: ExtensionAPIFunctionParameter): Router => {
       })
   }
 
-  api.post('/bypass_start', async (req, res) =>
-    createNewClientActionProxy(req, res, 'icmaa-paypal', 'start', 'paypal_bypass/')
+  api.post('/checkout_start', async (req, res) =>
+    createNewClientActionProxy(req, res, 'icmaa-paypal', 'start', 'paypal_checkout/')
   )
 
-  api.post('/bypass_shipping', async (req, res) =>
-    createNewClientActionProxy(req, res, 'icmaa-paypal', 'shipping', 'paypal_bypass/')
+  api.post('/checkout_shipping', async (req, res) =>
+    createNewClientActionProxy(req, res, 'icmaa-paypal', 'shipping', 'paypal_checkout/')
   )
 
-  api.post('/bypass_approve', async (req, res) =>
-    createNewClientActionProxy(req, res, 'icmaa-paypal', 'approve', 'paypal_bypass/')
+  api.post('/checkout_approve', async (req, res) =>
+    createNewClientActionProxy(req, res, 'icmaa-paypal', 'approve', 'paypal_checkout/')
   )
 
-  api.post('/bypass_capture', async (req, res) =>
-    createNewClientActionProxy(req, res, 'icmaa-paypal', 'capture', 'paypal_bypass/')
+  api.post('/checkout_capture', async (req, res) =>
+    createNewClientActionProxy(req, res, 'icmaa-paypal', 'capture', 'paypal_checkout/')
   )
 
   return api
