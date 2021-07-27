@@ -14,7 +14,8 @@ This API extension gets and sends informations for PayPal payments to the VSBrig
          "checkout_start": "/checkout_start?token={{token}}&cartId={{cartId}}",
          "checkout_shipping": "/checkout_shipping?token={{token}}&cartId={{cartId}}",
          "checkout_approve": "/checkout_approve?token={{token}}&cartId={{cartId}}",
-         "checkout_capture": "/checkout_capture?token={{token}}&cartId={{cartId}}"
+         "checkout_capture": "/checkout_capture?token={{token}}&cartId={{cartId}}",
+         "checkout_fail": "/checkout_fail?token={{token}}&cartId={{cartId}}"
       }
    },
    ```
@@ -25,4 +26,5 @@ This API extension gets and sends informations for PayPal payments to the VSBrig
 /api/icmaa-paypal/checkout_shipping
 /api/icmaa-paypal/checkout_approve
 /api/icmaa-paypal/checkout_capture
+/api/icmaa-paypal/checkout_fail
 ```
