@@ -49,15 +49,16 @@ module.exports.RestClient = function (options) {
   }
 
   function apiCall (request_data, request_token = '') {
-    logger.debug('Calling API endpoint: ' + request_data.method + ' ' + request_data.url + ' token: ' + request_token);
-
-    logger.info({
+    const requestInfo = {
       url: request_data.url,
       method: request_data.method,
       headers: request_token ? { Authorization: 'Bearer ' + request_token } : oauth.toHeader(oauth.authorize(request_data, token)),
       json: true,
       body: request_data.body
-    });
+    }
+
+    logger.info('Calling API endpoint', requestInfo)
+
     /* eslint no-undef: off */
     return new Promise((resolve, reject) => {
       const jar = request.jar()
@@ -74,26 +75,30 @@ module.exports.RestClient = function (options) {
         body: request_data.body,
         jar
       }, (error, response, body) => {
-        logger.debug('Response received')
         if (error) {
-          logger.error('Error occured: ' + error);
-          reject(error);
-          return;
+          logger.error('Error occured: ' + error)
+          reject(error)
+
+          return
         } else if (!httpCallSucceeded(response)) {
           let errorMessage = ''
 
-          if (body) {
-            errorMessage = 'HTTP ERROR ' + body.code;
+          if (body?.code) {
+            errorMessage = 'ERROR ' + body.code
+            if (body?.result) {
+              errorMessage = errorString(body.result, body?.parameters || {})
+            }
           } else {
-            errorMessage = 'HTTP ERROR ' + response.code;
+            errorMessage = body
           }
 
-          // eslint-disable-next-line no-prototype-builtins
-          if (body && body.hasOwnProperty('result')) { errorMessage = errorString(body.result, body.hasOwnProperty('parameters') ? body.parameters : {}); }
+          logger.error('API call failed with: ' + errorMessage, requestInfo)
+          reject(errorMessage)
 
-          logger.error('API call failed: ' + errorMessage);
-          reject(errorMessage);
+          return
         }
+
+        logger.info('API response received', requestInfo)
         resolve(body);
       });
     });
