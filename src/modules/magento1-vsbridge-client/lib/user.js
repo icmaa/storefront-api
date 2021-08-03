@@ -14,9 +14,16 @@ module.exports = function (restClient) {
       return getResponse(data);
     });
   }
-  module.resetPassword = function (emailData) {
+  module.resetPassword = function (data) {
     url += 'resetPassword';
-    return restClient.post(url, { email: emailData.email }).then((data) => {
+    return restClient.post(url, { email: data.email }).then((data) => {
+      return getResponse(data);
+    });
+  }
+  module.resetPasswordUsingResetToken = function (data) {
+    url += 'resetPasswordPost';
+    const { email, newPassword, resetToken } = data
+    return restClient.post(url, { email, newPassword, resetToken }).then((data) => {
       return getResponse(data);
     });
   }
