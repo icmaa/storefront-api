@@ -36,8 +36,8 @@
     "redis-tag-cache": "^1.2.1",
     "request": "^2.85.0",
     "request-promise-native": "^1.0.5",
-    "semver": "^6.3.0",
-    "sharp": "^0.23.4",
+    "semver": "^7.3.5",
+    "sharp": "^0.29.0",
     "syswide-cas": "^5.3.0",
     "typescript": "3.9.*"
   },
@@ -50,8 +50,7 @@
     "@types/lodash": "^4.14.149",
     "@types/node": "^11.13.4",
     "@types/redis": "^2.8.14",
-    "@types/semver": "^6.2.0",
-    "@types/sharp": "^0.23.1",
+    "@types/sharp": "^0.28.6",
     "jest": "^24.8.0",
     "ts-jest": "^24.0.2"
   },
