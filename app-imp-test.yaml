@@ -8,10 +8,10 @@ env_variables:
   GCLOUD_OPERATIONS_ENABLED: true
 instance_class: F2
 automatic_scaling:
-  min_instances: 1
+  min_instances: 0
   max_instances: 10
-  min_idle_instances: 1
-  max_idle_instances: 5
+  min_idle_instances: 0
+  max_idle_instances: 2
   max_concurrent_requests: 80
   min_pending_latency: 150ms
   target_throughput_utilization: 0.75
