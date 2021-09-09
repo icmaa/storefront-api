@@ -12,6 +12,7 @@ RUN chmod +x /usr/local/bin/storefront-api
 RUN apk add --no-cache \
     python3 make g++ ca-certificates \
     gcc libgcc libstdc++ linux-headers \
+    vips-dev fftw-dev gcc g++ make libc6-compat \
     bash curl wget git rsync
 
 CMD ["storefront-api"]
