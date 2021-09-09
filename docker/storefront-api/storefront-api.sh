@@ -3,8 +3,10 @@ set -e
 
 yarn install || exit $?
 
-if [ "$VS_ENV" = 'dev' ]; then
+if [ "$NODE_CONFIG_ENV" = 'development' ]; then
+  yarn build:clean
   yarn dev
 else
+  yarn build
   yarn start
 fi

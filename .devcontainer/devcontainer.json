@@ -1,0 +1,18 @@
+{
+  "name": "icmaa/storefront-api",
+  "forwardPorts": [
+    8080,
+		9200,
+		9300
+  ],
+  "postCreateCommand": [
+    "bash", ".devcontainer/scripts/postCreate.sh"
+  ],
+  "dockerComposeFile": [
+    "../docker-compose.yml",
+    "../docker-compose-elasticsearch.yml",
+    "docker-compose.yml"
+  ],
+  "service": "app",
+  "workspaceFolder": "/var/www"
+}

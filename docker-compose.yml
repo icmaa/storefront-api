@@ -1,40 +1,16 @@
 version: '3.0'
 services:
-  es7:
-    container_name: sfa_elasticsearch
-    build: docker/elasticsearch7/
-    ulimits:
-      memlock:
-        soft: -1
-        hard: -1
-    volumes:
-      - ./docker/elasticsearch7/config/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml:ro
-    ports:
-      - '9200:9200'
-      - '9300:9300'
-    environment:
-      - discovery.type=single-node
-      - cluster.name=docker-cluster
-      - bootstrap.memory_lock=true
-      - "ES_JAVA_OPTS=-Xmx512m -Xms512m"
 
   redis:
-    container_name: sfa_redis
     image: 'redis:4-alpine'
     ports:
       - '6379:6379'
 
   app:
-    # image: divante/storefront-api:latest
     build:
       context: .
       dockerfile: docker/storefront-api/Dockerfile
-    depends_on:
-      - es7
-      - redis
     env_file: docker/storefront-api/default.env
-    environment:
-      VS_ENV: dev
     volumes:
       - './config:/var/www/config'
       - './ecosystem.json:/var/www/ecosystem.json'
@@ -52,3 +28,5 @@ services:
       - /var/www/dist
     ports:
       - '8080:8080'
+    depends_on:
+      - redis

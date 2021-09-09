@@ -1,27 +1,17 @@
-FROM node:10-alpine3.11
-
-ENV VS_ENV prod
+FROM node:16-alpine
 
 WORKDIR /var/www
-
-RUN apk add --no-cache curl git python make g++
+EXPOSE 8080
 
 COPY package.json ./
 COPY yarn.lock ./
 
-RUN apk --no-cache --update upgrade musl
+COPY docker/storefront-api/storefront-api.sh /usr/local/bin/storefront-api
+RUN chmod +x /usr/local/bin/storefront-api
+
 RUN apk add --no-cache \
-			--repository http://dl-cdn.alpinelinux.org/alpine/edge/community \
-			--repository http://dl-cdn.alpinelinux.org/alpine/edge/main \
-			--virtual .build-deps \
-        python \
-        make \
-        g++ \
-        ca-certificates \
-        wget \
-    && yarn install --no-cache \
-    && apk del .build-deps
+    python3 make g++ ca-certificates \
+    gcc libgcc libstdc++ linux-headers \
+    bash curl wget git rsync
 
-COPY docker/storefront-api/storefront-api.sh /usr/local/bin/
-
-CMD ["storefront-api.sh"]
+CMD ["storefront-api"]
