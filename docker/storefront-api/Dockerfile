@@ -15,4 +15,6 @@ RUN apk add --no-cache \
     vips-dev fftw-dev gcc g++ make libc6-compat \
     bash curl wget git rsync
 
+RUN yarn global add @icmaa/config-sync
+
 CMD ["storefront-api"]

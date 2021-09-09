@@ -2,11 +2,8 @@
   "name": "icmaa/storefront-api",
   "forwardPorts": [
     8080,
-		9200,
-		9300
-  ],
-  "postCreateCommand": [
-    "bash", ".devcontainer/scripts/postCreate.sh"
+    9200,
+    9300
   ],
   "dockerComposeFile": [
     "../docker-compose.yml",
