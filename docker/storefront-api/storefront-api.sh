@@ -8,5 +8,5 @@ if [ "$NODE_CONFIG_ENV" = 'development' ]; then
   yarn dev
 else
   yarn build
-  yarn start
+  node dist/src/index.js
 fi
