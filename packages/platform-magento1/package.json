@@ -3,6 +3,7 @@
   "version": "1.0.0-rc.3",
   "description": "Storefront GraphQL API",
   "license": "MIT",
+  "private": true,
   "scripts": {
     "dev": "tsc --build -w",
     "build": "tsc --build",
@@ -30,7 +31,7 @@
     "@storefront-api/platform-abstract": "^1.0.0-rc.3",
     "bodybuilder": "^2.2.21",
     "config": "^1.30.0",
-    "magento1-vsbridge-client": "git+https://github.com/icmaa/magento1-vsbridge-client#master",
+    "magento1-vsbridge-client": "^1.0.1",
     "typescript": "3.9.*"
   },
   "devDependencies": {

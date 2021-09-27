@@ -1,4 +1,4 @@
-runtime: nodejs14
+runtime: nodejs16
 service: storefront-api
 entrypoint: cross-env VSF_BIND_PORT=$PORT node dist/src/index.js
 env_variables:
