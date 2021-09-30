@@ -13,17 +13,23 @@ services:
     env_file: docker/storefront-api/default.env
     volumes:
       - './config:/var/www/config'
-      - './ecosystem.json:/var/www/ecosystem.json'
       - './migrations:/var/www/migrations'
-      - './package.json:/var/www/package.json'
-      - './babel.config.js:/var/www/babel.config.js'
-      - './tsconfig.json:/var/www/tsconfig.json'
-      - './nodemon.json:/var/www/nodemon.json'
-      - './graphql-schema-linter.config.js:/var/www/graphql-schema-linter.config.js'
       - './scripts:/var/www/scripts'
       - './src:/var/www/src'
       - './var:/var/www/var'
       - './packages:/var/www/packages'
+      - './package.json:/var/www/package.json'
+      - './tsconfig.json:/var/www/tsconfig.json'
+      - './tsconfig.build.json:/var/www/tsconfig.build.json'
+      - './graphql-schema-linter.config.js:/var/www/graphql-schema-linter.config.js'
+      - './.eslintrc.js:/var/www/.eslintrc.js'
+      - './.eslintignore:/var/www/.eslintignore'
+      - './.gitignore:/var/www/.gitignore'
+      - './.huskyrc.js:/var/www/.huskyrc.js'
+      - './ecosystem.json:/var/www/ecosystem.json'
+      - './lerna.json:/var/www/lerna.json'
+      - './nodemon.json:/var/www/nodemon.json'
+      - './yarn.lock:/var/www/yarn.lock'
     tmpfs:
       - /var/www/dist
     ports:
