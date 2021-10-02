@@ -8,6 +8,7 @@ services:
       - '9300:9300'
     environment:
       ES_JAVA_OPTS: "-Xmx512m -Xms512m"
+      http.max_content_length: 512mb
       discovery.type: single-node
 
   app:
