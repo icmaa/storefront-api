@@ -1,7 +1,14 @@
 version: '3.0'
+
 services:
   app:
+    environment:
+      XDEBUG_SESSION: vscode
     volumes:
+      - esdata:/usr/share/elasticsearch/data:rw
       - .:/workspace:cached
     command: /bin/sh -c "while sleep 1000; do :; done"
- 
+
+volumes:
+  esdata:
+    driver: local
