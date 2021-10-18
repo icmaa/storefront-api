@@ -79,6 +79,9 @@ export default ({ config, db }) => {
     }
   */
   userApi.post('/create', (req, res) => {
+    // Disable this endpoint for anybody who knows about this endpoint and prevent reCaptcha bypass.
+    return apiStatus(res, 'Use "/api/icmaa-user/create" endpoint instead.', 400);
+
     const ajv = new Ajv();
     const userRegisterSchema = require('../models/userRegister.schema.json')
     let userRegisterSchemaExtension = {};
