@@ -63,4 +63,4 @@ jobs:
           credentials: ${{ env.ENV == 'production' && secrets.GCP_VSF_SA_KEY_PROD || secrets.GCP_VSF_SA_KEY_TEST }}
           deliverables: app-${{ matrix.env.MANDANT }}-${{ env.ENV == 'production' && 'prod' || 'test' }}.yaml
           version: ${{ env.VERSION_NAME }}
-          promote: ${{ env.ENV == 'production' && 'false' || 'true' }}
+          # promote: ${{ env.ENV == 'production' && 'false' || 'true' }}
