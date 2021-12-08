@@ -1,5 +1,5 @@
-module.exports = function (restClient) {
-  const module = {};
+export default (restClient) => {
+  const module: any = {};
   const urlPrefix = 'order/';
   let url = urlPrefix;
   function isResponseValid (data) {

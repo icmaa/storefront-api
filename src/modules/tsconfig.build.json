@@ -1,5 +1,7 @@
 {
   "references": [
+    { "path": "./platform-magento1" },
+    { "path": "./magento1-vsbridge-client" },
     { "path": "./icmaa" },
     { "path": "./icmaa-checkout" },
     { "path": "./icmaa-paypal" },
@@ -16,7 +18,7 @@
     { "path": "./icmaa-twitter" },
     { "path": "./icmaa-user" },
     { "path": "./icmaa-wishlist" },
-    { "path": "./icmaa-logs" }
+    { "path": "./icmaa-logs" },
   ],
   "files": [],
   "include": []

@@ -1,18 +1,21 @@
-const RestClient = require('./lib/rest_client').RestClient
-const user = require('./lib/user')
-const cart = require('./lib/cart')
-const order = require('./lib/order')
-const stock = require('./lib/stock')
-const contact = require('./lib/contact')
-const wishlist = require('./lib/wishlist')
-const stockAlert = require('./lib/stock_alert')
-const newsletter = require('./lib/newsletter')
-const address = require('./lib/address')
+import RestClient from './lib/rest_client'
+import user from './lib/user'
+import cart from './lib/cart'
+import order from './lib/order'
+import stock from './lib/stock'
+import contact from './lib/contact'
+import wishlist from './lib/wishlist'
+import stockAlert from './lib/stock_alert'
+import newsletter from './lib/newsletter'
+import address from './lib/address'
 
 const MAGENTO_API_VERSION = 'V1'
 
-module.exports.Magento1Client = function (options) {
-  const instance = {
+export type Magento1Client = any
+
+// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+export default function (options: any): any {
+  const instance: any = {
     addMethods (key, module) {
       const client = RestClient(options)
       if (module) {

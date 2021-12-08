@@ -5,7 +5,7 @@ import { DefaultCatalogModule } from '@storefront-api/default-catalog'
 import { DefaultImgModule } from '@storefront-api/default-img'
 import { IcmaaModule } from 'icmaa'
 import { StorefrontApiModule } from '@storefront-api/lib/module'
-import * as magento1 from '@storefront-api/platform-magento1'
+import * as magento1 from 'icmaa-platform-magento1'
 
 export const modules: StorefrontApiModule[] = [
   DefaultVuestorefrontApiModule({
