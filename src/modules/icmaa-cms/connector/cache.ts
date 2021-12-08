@@ -22,11 +22,11 @@ const cacheHandler = async (config: Record<string, any>, res: Record<string, any
       'api:' + hash
     ).then(output => {
       if (output !== null) {
-        res.setHeader('X-VS-Cache', 'Hit')
+        res.setHeader('x-vs-cache', 'hit')
         return apiStatus(res, output, 200)
       }
 
-      res.setHeader('X-VS-Cache', 'Miss')
+      res.setHeader('x-vs-cache', 'miss')
       return false
     }).catch(err => {
       console.error(err)

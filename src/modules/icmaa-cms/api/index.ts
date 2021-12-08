@@ -1,5 +1,6 @@
 import { ExtensionAPIFunctionParameter } from '@storefront-api/lib/module'
 
+import Logger from '@storefront-api/lib/logger'
 import { apiStatus } from '@storefront-api/lib/util'
 import { sha3_224 } from 'js-sha3'
 import { Router } from 'express'
@@ -23,9 +24,9 @@ export default ({ config }: ExtensionAPIFunctionParameter): Router => {
 
     const cachedResult = await cacheHandler(config, res, reqHash, req)
     if (!cachedResult) {
-      console.log(`Cache miss [${url}]`)
+      Logger.debug(`Cache miss [${url}]`)
     } else {
-      console.log(`Cache hit [${url}]`)
+      Logger.debug(`Cache hit [${url}]`)
       return
     }
 
@@ -60,9 +61,9 @@ export default ({ config }: ExtensionAPIFunctionParameter): Router => {
 
     const cachedResult = await cacheHandler(config, res, reqHash, req)
     if (!cachedResult) {
-      console.log(`Cache miss [${url}]`)
+      Logger.debug(`Cache miss [${url}]`)
     } else {
-      console.log(`Cache hit [${url}]`)
+      Logger.debug(`Cache hit [${url}]`)
       return
     }
 
@@ -202,9 +203,9 @@ export default ({ config }: ExtensionAPIFunctionParameter): Router => {
 
     const cachedResult = await cacheHandler(config, res, reqHash, req)
     if (!cachedResult) {
-      console.log(`Cache miss [${url}]`)
+      Logger.debug(`Cache miss [${url}]`)
     } else {
-      console.log(`Cache hit [${url}]`)
+      Logger.debug(`Cache hit [${url}]`)
       return
     }
 

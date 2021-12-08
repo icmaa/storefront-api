@@ -100,7 +100,10 @@ export class Server {
     }) as express.RequestHandler)
 
     // logger
-    this.express.use(morgan(!this.isProd ? 'dev' : ''));
+    morgan.token('vs-cache', (req, res) => res.getHeader('x-vs-cache') || 'cache-none')
+    this.express.use(
+      morgan(':method :url :status :res[content-length] :vs-cache - :response-time ms')
+    )
 
     this.express.use('/media', express.static(join(__dirname, config.get(`${config.get('platform')}.assetPath`))))
 

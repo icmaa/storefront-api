@@ -28,7 +28,7 @@ export class ProcessorFactory {
       const moduleName = './' + entityType
 
       if (!module_exists(moduleName)) {
-        Logger.info('No additional data adapter for ' + entityType)
+        Logger.debug('No additional data adapter for ' + entityType)
         return null
       }
 
@@ -36,7 +36,7 @@ export class ProcessorFactory {
     }
 
     if (!AdapterClass) {
-      Logger.info('No additional data adapter for ' + entityType)
+      Logger.debug('No additional data adapter for ' + entityType)
       return null
     } else {
       const adapter_instance = new AdapterClass(this.config, entityType, indexName, req, res);
