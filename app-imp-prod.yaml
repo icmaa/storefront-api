@@ -12,7 +12,7 @@ automatic_scaling:
   max_instances: 20
   min_idle_instances: 2
   max_idle_instances: 5
-  max_concurrent_requests: 80
+  max_concurrent_requests: 50
   min_pending_latency: 150ms
   target_throughput_utilization: 0.75
 vpc_access_connector:
