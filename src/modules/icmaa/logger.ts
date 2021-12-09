@@ -13,7 +13,7 @@ export default function registerLogging ({ app: express, logger }: StorefrontApi
   morgan.token('body', (req, res) => (res.statusCode >= 400 || req.method === 'POST') ? req.body : '')
   morgan.token('response-body', (req, res) => res.statusCode >= 400 ? res.body : '')
 
-  if (!process.env.GCLOUD_OPERATIONS_ENABLED) {
+  if (process.env.GCLOUD_OPERATIONS_ENABLED) {
     // GAE structured-data output
     const morganStream = morgan((tokens, req, res) => {
       const payload = {
