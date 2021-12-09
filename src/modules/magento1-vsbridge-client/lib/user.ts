@@ -1,5 +1,5 @@
-module.exports = function (restClient) {
-  const module = {};
+export default (restClient) => {
+  const module: any = {};
   let url = 'user/';
   function getResponse (data) {
     if (data.code === 200) {

@@ -27,7 +27,6 @@ services:
       - './.gitignore:/var/www/.gitignore'
       - './.huskyrc.js:/var/www/.huskyrc.js'
       - './ecosystem.json:/var/www/ecosystem.json'
-      - './lerna.json:/var/www/lerna.json'
       - './nodemon.json:/var/www/nodemon.json'
       - './yarn.lock:/var/www/yarn.lock'
     tmpfs:

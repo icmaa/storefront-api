@@ -1,5 +1,5 @@
-module.exports = function (restClient) {
-  const module = {};
+export default (restClient) => {
+  const module: any = {};
   const urlPrefix = 'wishlist/';
   let url = urlPrefix;
   function getResponse (data) {

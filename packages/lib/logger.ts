@@ -1,8 +1,6 @@
-import { isObject } from 'lodash';
-import clc from 'cli-color';
-import { inspect } from 'util';
-
-const yellow = clc.yellow
+import isObject from 'lodash/isObject'
+import { green, yellow, red, magentaBright, cyanBright } from 'cli-color'
+import { inspect } from 'util'
 
 export interface BaseLogger {
   info(message: any, context?: string|Record<any, any>),
@@ -26,6 +24,8 @@ export class Logger implements BaseLogger {
   private static instance?: typeof Logger | BaseLogger = Logger;
   protected context?: string
   private readonly isTimestampEnabled
+
+  private static isProd: boolean = process.env.NODE_ENV === 'production'
 
   public constructor (isTimestampEnabled = false, context?: string) {
     this.isTimestampEnabled = isTimestampEnabled
@@ -51,6 +51,7 @@ export class Logger implements BaseLogger {
   }
 
   public debug (message: any, context?: string|Record<any, any>) {
+    if (Logger.isProd) return
     this.callFunction('debug', message, context);
   }
 
@@ -71,7 +72,7 @@ export class Logger implements BaseLogger {
   }
 
   public static info (message: any, context: string|Record<any, any> = '', isTimeDiffEnabled = true) {
-    this.printMessage(message, clc.green, context, isTimeDiffEnabled);
+    this.printMessage(message, green, context, isTimeDiffEnabled);
   }
 
   public static error (
@@ -80,20 +81,21 @@ export class Logger implements BaseLogger {
     context: string|Record<any, any> = '',
     isTimeDiffEnabled = true
   ) {
-    this.printMessage(message, clc.red, context, isTimeDiffEnabled);
+    this.printMessage(message, red, context, isTimeDiffEnabled);
     this.printStackTrace(trace);
   }
 
   public static warn (message: any, context: string|Record<any, any> = '', isTimeDiffEnabled = true) {
-    this.printMessage(message, clc.yellow, context, isTimeDiffEnabled);
+    this.printMessage(message, yellow, context, isTimeDiffEnabled);
   }
 
   public static debug (message: any, context: string|Record<any, any> = '', isTimeDiffEnabled = true) {
-    this.printMessage(message, clc.magentaBright, context, isTimeDiffEnabled);
+    if (this.isProd) return
+    this.printMessage(message, magentaBright, context, isTimeDiffEnabled);
   }
 
   public static verbose (message: any, context: string|Record<any, any> = '', isTimeDiffEnabled = true) {
-    this.printMessage(message, clc.cyanBright, context, isTimeDiffEnabled);
+    this.printMessage(message, cyanBright, context, isTimeDiffEnabled);
   }
 
   private callFunction (

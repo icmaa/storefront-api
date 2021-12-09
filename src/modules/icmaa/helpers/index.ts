@@ -1,10 +1,8 @@
 import { Request } from 'express'
 import { IConfig } from 'config'
-import { multiStoreConfig } from '@storefront-api/platform-magento1/util'
-import { Magento1Client as Magento1ClientType } from 'magento1-vsbridge-client'
+import { multiStoreConfig } from 'icmaa-platform-magento1/src/util'
+import Magento1Client, { Magento1Client as Magento1ClientType } from 'icmaa-magento1-vsbridge-client'
 import qs from 'query-string'
-
-const Magento1Client = require('magento1-vsbridge-client').Magento1Client
 
 /**
 * Add new action to `magento1-vsbridge-client` and `module` instance

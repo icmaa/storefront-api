@@ -168,7 +168,7 @@ export default ({ config }: ExtensionAPIFunctionParameter) => async function (re
               }
 
               const cacheTags = tagsArray.join(' ')
-              res.setHeader('X-VS-Cache-Tags', cacheTags)
+              res.setHeader('x-vs-cache-tags', cacheTags)
             }
 
             let resultProcessor = factory.getAdapter(entityType, indexName, req, res)
@@ -205,12 +205,12 @@ export default ({ config }: ExtensionAPIFunctionParameter) => async function (re
       'api:' + reqHash
     ).then(output => {
       if (output !== null) {
-        res.setHeader('X-VS-Cache', 'Hit')
+        res.setHeader('x-vs-cache', 'hit')
         res.json(output)
-        Logger.info(`cache hit [${req.url}], cached request: ${Date.now() - s}ms`)
+        Logger.debug(`Cache hit [${req.url}], cached request: ${Date.now() - s}ms`)
       } else {
-        res.setHeader('X-VS-Cache', 'Miss')
-        Logger.info(`cache miss [${req.url}], request: ${Date.now() - s}ms`)
+        res.setHeader('x-vs-cache', 'miss')
+        Logger.debug(`Cache miss [${req.url}], request: ${Date.now() - s}ms`)
         dynamicRequestHandler()
       }
     }).catch(err => Logger.error(err))

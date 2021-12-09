@@ -1,5 +1,5 @@
-module.exports = function (restClient) {
-  const module = {};
+export default (restClient) => {
+  const module: any = {};
   const urlPrefix = 'stockalert/';
   let url = urlPrefix;
   function getResponse (data) {
@@ -16,7 +16,7 @@ module.exports = function (restClient) {
       url += `?token=${customerToken}`
     }
 
-    const alertData = {
+    const alertData: Record<string, any> = {
       productId: productId
     }
 

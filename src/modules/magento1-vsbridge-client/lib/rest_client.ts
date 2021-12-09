@@ -1,21 +1,19 @@
-'use strict';
+import logger from './log'
+import OAuth from 'oauth-1.0a'
+import request from 'request'
 
-const OAuth = require('oauth-1.0a');
-const request = require('request');
-const logger = require('./log');
+export default (options) => {
+  const instance: any = {};
 
-module.exports.RestClient = function (options) {
-  const instance = {};
-
-  var servelrUrl = options.url;
-  var oauth = OAuth({
+  const servelrUrl = options.url;
+  const oauth = OAuth({
     consumer: {
       public: options.consumerKey,
       secret: options.consumerSecret
     },
     signature_method: 'HMAC-SHA1'
   });
-  var token = {
+  const token = {
     public: options.accessToken,
     secret: options.accessTokenSecret
   };

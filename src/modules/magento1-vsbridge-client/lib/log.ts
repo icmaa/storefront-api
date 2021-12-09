@@ -1,8 +1,6 @@
-var winston = require('winston');
+import winston from 'winston'
 
-winston.emitErrs = true;
-
-var logger = new winston.Logger({
+const log = new winston.Logger({
   transports: [
     new winston.transports.Console({
       level: 'debug',
@@ -14,6 +12,6 @@ var logger = new winston.Logger({
   exitOnError: false
 });
 
-logger.info('Winston logging library initialized.');
+log.info('Winston logging library initialized.')
 
-module.exports = logger;
+export default log
