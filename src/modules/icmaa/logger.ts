@@ -16,11 +16,11 @@ export default function registerLogging ({ app: express, logger }: StorefrontApi
     // GAE structured-data output
     const morganStream = morgan((tokens, req, res) => {
       const payload = {
-        severity: tokens.gaeSeverity(req, res),
+        severity: tokens['gae-severity'](req, res),
         labels: {
-          service: tokens.gaeService(req, res),
-          version: tokens.gaeVersion(req, res),
-          instanceId: tokens.gaeInstanceId(req, res)
+          service: tokens['gae-service'](req, res),
+          version: tokens['gae-version'](req, res),
+          instanceId: tokens['gae-instance-id'](req, res)
         },
         status: tokens.status(req, res),
         method: tokens.method(req, res),

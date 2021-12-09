@@ -28,7 +28,7 @@ export default (options) => {
     }
     let parameterPlaceholder
     if (parameters instanceof Array) {
-      for (let i = 0 i < parameters.length i++) {
+      for (let i = 0; i < parameters.length; i++) {
         parameterPlaceholder = '%' + (i + 1).toString()
         message = message.replace(parameterPlaceholder, parameters[i])
       }
