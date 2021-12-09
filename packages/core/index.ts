@@ -18,8 +18,6 @@ import { mergeTypes } from 'merge-graphql-schemas';
 import initializeDb from '@storefront-api/lib/db';
 import { catchInvalidRequests } from '@storefront-api/lib/error';
 
-import Logging from '@google-cloud/logging'
-
 interface ServerConfigParams {
   modules: StorefrontApiModule[],
   port?: number,
