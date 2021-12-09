@@ -1,11 +1,11 @@
 import AbstractAddressProxy from '@storefront-api/platform-abstract/address'
-import { multiStoreConfig } from './util';
+import { multiStoreConfig } from './util'
 
 class AddressProxy extends AbstractAddressProxy {
   public constructor (config, req) {
-    const Magento1Client = require('icmaa-magento1-vsbridge-client').default;
+    const Magento1Client = require('icmaa-magento1-vsbridge-client').default
     super(config, req)
-    this.api = Magento1Client(multiStoreConfig(config.magento1.api, req));
+    this.api = Magento1Client(multiStoreConfig(config.magento1.api, req))
   }
 
   public list (customerToken) {
@@ -13,7 +13,7 @@ class AddressProxy extends AbstractAddressProxy {
   }
 
   public update (customerToken, addressData) {
-    return this.api.address.update(customerToken, addressData);
+    return this.api.address.update(customerToken, addressData)
   }
 
   public get (customerToken, addressId) {

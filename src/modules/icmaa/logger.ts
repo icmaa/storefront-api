@@ -5,6 +5,7 @@ export default function registerLogging ({ app: express, logger }: StorefrontApi
   // GAE metrics
   morgan.token('gae-instance-id', () => process.env.GAE_INSTANCE || '-')
   morgan.token('gae-version', () => process.env.GAE_VERSION || '-')
+  morgan.token('gae-service', () => process.env.GAE_SERVICE || '-')
   morgan.token('gae-severity', (req, res) => res.statusCode < 400 ? 'INFO' : 'ERROR')
 
   // API metrics
@@ -16,15 +17,18 @@ export default function registerLogging ({ app: express, logger }: StorefrontApi
     const morganStream = morgan((tokens, req, res) => {
       const payload = {
         severity: tokens.gaeSeverity(req, res),
+        labels: {
+          service: tokens.gaeService(req, res),
+          version: tokens.gaeVersion(req, res),
+          instanceId: tokens.gaeInstanceId(req, res)
+        },
         status: tokens.status(req, res),
         method: tokens.method(req, res),
         url: tokens.url(req, res),
         body: tokens.body(req, res),
         contentLength: tokens.res(req, res, 'content-length'),
         responseTime: tokens['response-time'](req, res) + 'ms',
-        cache: tokens.cache(req, res),
-        instanceId: tokens.gaeInstanceId(req, res),
-        version: tokens.gaeVersion(req, res)
+        cache: tokens.cache(req, res)
       }
 
       return JSON.stringify(payload)

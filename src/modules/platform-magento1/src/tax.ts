@@ -31,7 +31,7 @@ class TaxProxy extends AbstractTaxProxy {
               sourcePriceInclTax = store.tax.sourcePriceIncludesTax || null
               finalPriceInclTax = store.tax.finalPriceIncludesTax || null
               this._storeConfigTax = store.tax
-              break;
+              break
             }
           }
         }

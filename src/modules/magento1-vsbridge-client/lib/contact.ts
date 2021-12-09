@@ -1,18 +1,18 @@
 export default (restClient) => {
-  const module: any = {};
-  const urlPrefix = 'contact/';
-  let url = urlPrefix;
+  const module: any = {}
+  const urlPrefix = 'contact/'
+  let url = urlPrefix
   function getResponse (data) {
     if (data.code === 200) {
-      return data.result;
+      return data.result
     }
-    return false;
+    return false
   }
   module.submit = (form) => {
-    url += 'submit';
+    url += 'submit'
     return restClient.post(url, { form }).then((data) => {
-      return getResponse(data);
-    });
-  };
-  return module;
-};
+      return getResponse(data)
+    })
+  }
+  return module
+}
