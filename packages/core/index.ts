@@ -18,6 +18,8 @@ import { mergeTypes } from 'merge-graphql-schemas';
 import initializeDb from '@storefront-api/lib/db';
 import { catchInvalidRequests } from '@storefront-api/lib/error';
 
+import Logging from '@google-cloud/logging'
+
 interface ServerConfigParams {
   modules: StorefrontApiModule[],
   port?: number,
@@ -100,11 +102,16 @@ export class Server {
     }) as express.RequestHandler)
 
     // logger
-    morgan.token('gae-instance-id', () => process.env.GAE_INSTANCE || 'any')
     morgan.token('vs-cache', (req, res) => res.getHeader('x-vs-cache') || 'cache-none')
+    morgan.token('gae-instance-id', () => process.env.GAE_INSTANCE || 'any')
+    morgan.token('gae-severity', (req, res) => res.statusCode < 400 ? 'INFO' : 'WARNING')
+
     this.express.use(
-      // morgan(':method :url :status :res[content-length] :vs-cache :gae-instance-id - :response-time ms')
-      morgan('{ "method": ":method", "url": ":url", "status": ":status" "content-length": ":res[content-length]", "cache": ":vs-cache" "cache": ":gae-instance-id", "response-time": ":response-time ms" }')
+      morgan(':method :url :status :res[content-length] :vs-cache :gae-instance-id - :response-time ms')
+    )
+
+    this.express.use(
+      morgan('{ "severity": ":gae-severity", "method": ":method", "url": ":url", "status": ":status", "content-length": ":res[content-length]", "cache": ":vs-cache", "instance-id": ":gae-instance-id", "response-time": ":response-time ms" }')
     )
 
     this.express.use('/media', express.static(join(__dirname, config.get(`${config.get('platform')}.assetPath`))))
