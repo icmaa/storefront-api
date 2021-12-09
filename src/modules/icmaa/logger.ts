@@ -11,13 +11,14 @@ export default function registerLogging ({ app: express, logger }: StorefrontApi
   // API metrics
   morgan.token('cache', (req, res) => res.getHeader('x-vs-cache') || 'cache-none')
   morgan.token('body', (req, res) => (res.statusCode >= 400 || req.method === 'POST') ? req.body : '')
+  morgan.token('response-body', (req, res) => res.statusCode >= 400 ? res.body : '')
 
-  if (process.env.GCLOUD_OPERATIONS_ENABLED) {
+  if (!process.env.GCLOUD_OPERATIONS_ENABLED) {
     // GAE structured-data output
     const morganStream = morgan((tokens, req, res) => {
       const payload = {
         severity: tokens['gae-severity'](req, res),
-        labels: {
+        'logging.googleapis.com/labels': {
           service: tokens['gae-service'](req, res),
           version: tokens['gae-version'](req, res),
           instanceId: tokens['gae-instance-id'](req, res)
@@ -26,6 +27,7 @@ export default function registerLogging ({ app: express, logger }: StorefrontApi
         method: tokens.method(req, res),
         url: tokens.url(req, res),
         body: tokens.body(req, res),
+        response: tokens['response-body'](req, res),
         contentLength: tokens.res(req, res, 'content-length'),
         responseTime: tokens['response-time'](req, res) + 'ms',
         cache: tokens.cache(req, res)
