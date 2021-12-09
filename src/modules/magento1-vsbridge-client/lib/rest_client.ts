@@ -55,7 +55,7 @@ export default (options) => {
       body: request_data.body
     }
 
-    Logger.info('Calling API endpoint', requestInfo)
+    Logger.debug('Calling API endpoint', requestInfo)
 
     /* eslint no-undef: off */
     return new Promise((resolve, reject) => {
@@ -96,7 +96,7 @@ export default (options) => {
           return
         }
 
-        Logger.info('API response received', requestInfo)
+        Logger.debug('API response received', requestInfo)
         resolve(body)
       })
     })
