@@ -19,9 +19,9 @@ export default function registerLogging ({ app: express, logger }: StorefrontApi
       const payload = {
         severity: tokens['gae-severity'](req, res),
         'logging.googleapis.com/labels': {
-          service: tokens['gae-service'](req, res),
-          version: tokens['gae-version'](req, res),
-          instanceId: tokens['gae-instance-id'](req, res)
+          module_id: tokens['gae-service'](req, res),
+          version_id: tokens['gae-version'](req, res),
+          instance_id: tokens['gae-instance-id'](req, res)
         },
         status: tokens.status(req, res),
         method: tokens.method(req, res),
