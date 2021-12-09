@@ -100,22 +100,7 @@ export class Server {
     }) as express.RequestHandler)
 
     // logger
-    morgan.token('gae-instance-id', () => process.env.GAE_INSTANCE || '-')
-    morgan.token('gae-version', () => process.env.GAE_VERSION || '-')
-    morgan.token('gae-severity', (req, res) => res.statusCode < 400 ? 'INFO' : 'ERROR')
-    morgan.token('vs-cache', (req, res) => res.getHeader('x-vs-cache') || 'cache-none')
-    morgan.token('body', (req) => {
-      if (req.method === 'POST') return JSON.stringify(req.body)
-      return `${req.body}`
-    })
-
-    this.express.use(
-      morgan(':method :url :status :res[content-length] :vs-cache :gae-instance-id - :response-time ms')
-    )
-
-    this.express.use(
-      morgan('{ "severity": ":gae-severity", "method": ":method", "url": ":url", "body": :body, "status": ":status", "contentLength": ":res[content-length]", "cache": ":vs-cache", "instanceId": ":gae-instance-id", "version": ":gae-version", "responseTime": ":response-time ms" }')
-    )
+    // this.express.use(morgan(!this.isProd ? 'dev' : ''));
 
     this.express.use('/media', express.static(join(__dirname, config.get(`${config.get('platform')}.assetPath`))))
 
