@@ -33,6 +33,6 @@ export default function registerLogging (express: Express): void {
     express.use(morganStream)
   } else {
     // Default output
-    express.use(morgan(':method :url :status :res[content-length] :vs-cache :gae-instance-id - :response-time ms'))
+    express.use(morgan(':method :url :status :res[content-length] :cache :gae-instance-id - :response-time ms'))
   }
 }
