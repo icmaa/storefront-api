@@ -105,7 +105,7 @@ export class Server {
     morgan.token('vs-cache', (req, res) => res.getHeader('x-vs-cache') || 'cache-none')
     morgan.token('body', (req) => {
       if (req.method === 'POST') return JSON.stringify(req.body)
-      return req.body
+      return `${req.body}`
     })
 
     this.express.use(
@@ -113,7 +113,7 @@ export class Server {
     )
 
     this.express.use(
-      morgan('{ "severity": ":gae-severity", "method": ":method", "url": ":url", "body": ":body", "status": ":status", "contentLength": ":res[content-length]", "cache": ":vs-cache", "instanceId": ":gae-instance-id", "responseTime": ":response-time ms" }')
+      morgan('{ "severity": ":gae-severity", "method": ":method", "url": ":url", "body": :body, "status": ":status", "contentLength": ":res[content-length]", "cache": ":vs-cache", "instanceId": ":gae-instance-id", "responseTime": ":response-time ms" }')
     )
 
     this.express.use('/media', express.static(join(__dirname, config.get(`${config.get('platform')}.assetPath`))))
