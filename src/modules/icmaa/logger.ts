@@ -1,7 +1,7 @@
 import morgan from 'morgan'
-import { Express } from 'express'
+import { StorefrontApiContext } from '@storefront-api/lib/module/types'
 
-export default function registerLogging (express: Express): void {
+export default function registerLogging ({ app: express, logger }: StorefrontApiContext): void {
   // GAE metrics
   morgan.token('gae-instance-id', () => process.env.GAE_INSTANCE || '-')
   morgan.token('gae-version', () => process.env.GAE_VERSION || '-')
@@ -35,4 +35,6 @@ export default function registerLogging (express: Express): void {
     // Default output
     express.use(morgan(':method :url :status :res[content-length] :cache :gae-instance-id - :response-time ms'))
   }
+
+  logger.info('Initialized "morgan" for stdout request logging')
 }

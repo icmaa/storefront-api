@@ -6,6 +6,15 @@ import registerLogger from './logger'
 import invalidate from './invalidate'
 import warmup from './warmup'
 
+// Import custom middlewares before the first route,
+// this often is a requirement for middlewares like `morgan`
+export const IcmaaMiddleware: StorefrontApiModule = new StorefrontApiModule({
+  key: 'icmaa-middleware',
+  beforeRegistration: (context: StorefrontApiContext): void => {
+    registerLogger(context)
+  }
+})
+
 export const IcmaaModule: StorefrontApiModule = new StorefrontApiModule({
   key: 'icmaa-module',
 
@@ -13,7 +22,6 @@ export const IcmaaModule: StorefrontApiModule = new StorefrontApiModule({
     const rootPath = path.join(__dirname, '..')
     const registeredExtensions: string[] = config.get('modules.icmaa.registeredExtensions')
     registerExtensions({ app, config, db, registeredExtensions, rootPath })
-    registerLogger(app)
 
     app.get('/api/invalidate/all', invalidate)
     app.get('/_ah/warmup', warmup)

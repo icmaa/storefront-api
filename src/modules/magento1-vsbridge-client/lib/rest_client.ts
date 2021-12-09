@@ -1,4 +1,4 @@
-import logger from './log'
+import Logger from '@storefront-api/lib/logger'
 import OAuth from 'oauth-1.0a'
 import request from 'request'
 
@@ -55,7 +55,7 @@ export default (options) => {
       body: request_data.body
     }
 
-    logger.info('Calling API endpoint', requestInfo)
+    Logger.info('Calling API endpoint', requestInfo)
 
     /* eslint no-undef: off */
     return new Promise((resolve, reject) => {
@@ -74,7 +74,7 @@ export default (options) => {
         jar
       }, (error, response, body) => {
         if (error) {
-          logger.error('Error occured: ' + error)
+          Logger.error('Error occured: ' + error)
           reject(error)
 
           return
@@ -90,13 +90,13 @@ export default (options) => {
             errorMessage = body
           }
 
-          logger.error('API call failed with: ' + errorMessage, requestInfo)
+          Logger.error('API call failed with: ' + errorMessage, '', requestInfo)
           reject(errorMessage)
 
           return
         }
 
-        logger.info('API response received', requestInfo)
+        Logger.info('API response received', requestInfo)
         resolve(body);
       });
     });
