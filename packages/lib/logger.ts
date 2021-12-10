@@ -24,7 +24,7 @@ export class Logger implements BaseLogger {
     }
   }
 
-  public static pino = pino(!Logger.isProd
+  public static pino = pino(Logger.isProd
     ? {}
     : {
       transport: {
