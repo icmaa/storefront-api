@@ -122,7 +122,7 @@ function processSingleOrder (orderData, config, job, done?: (error?, result?) =>
             quote_id: cartId
           }, isThisAuthOrder))
         } else if (serverItem.qty !== clientItem.qty) {
-          logger.info(THREAD_ID + '< Wrong qty for ' + clientItem.sku, clientItem.qty, serverItem.qty)
+          logger.info(THREAD_ID + '< Wrong qty for ' + clientItem.sku + ', ' + clientItem.qty + ', ' + serverItem.qty)
           syncPromises.push(api.cart.update(null, cartId, { // use magento API
             sku: clientItem.parentSku && config.cart.setConfigurableProductOptions ? clientItem.parentSku : clientItem.sku,
             qty: clientItem.qty,
