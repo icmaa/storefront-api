@@ -13,6 +13,7 @@ export interface BaseLogger {
 export type LogLevel = 'info' | 'error' | 'warn' | 'debug'
 
 export class Logger implements BaseLogger {
+  private static lastTimestamp?: number = Date.now();
   private static isProd: boolean = process.env.NODE_CONFIG_ENV !== 'development'
 
   private static gaeMeta: any = {
@@ -23,7 +24,7 @@ export class Logger implements BaseLogger {
     }
   }
 
-  public static pino = pino(!Logger.isProd
+  public static pino = pino(Logger.isProd
     ? {}
     : {
       transport: {
@@ -32,7 +33,8 @@ export class Logger implements BaseLogger {
           colorize: true,
           levelFirst: true,
           translateTime: 'yyyy-dd-mm, h:MM:ss TT',
-          ignore: 'hostname'
+          ignore: 'hostname,timeDiff',
+          messageFormat: '{msg} - {timeDiff}'
         }
       }
     }
@@ -80,6 +82,9 @@ export class Logger implements BaseLogger {
     }
 
     if (context) Object.assign(log, { context })
+
+    Object.assign(log, { timeDiff: `+${Date.now() - Logger.lastTimestamp}ms` })
+    Logger.lastTimestamp = Date.now()
 
     Logger.pino[level](log)
   }
