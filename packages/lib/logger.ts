@@ -132,9 +132,14 @@ export class Logger implements BaseLogger {
     context: string|Record<any, any> = '',
     isTimeDiffEnabled?: boolean
   ) {
-    const output = isObject(message)
-      ? `${color('Object:')}\n${JSON.stringify(message, null, 2)}\n`
-      : color(message);
+    let output: string
+    if (isObject(message)) {
+      output = this.isProd
+        ? `Object: ${JSON.stringify(message)}\n`
+        : `${color('Object:')}\n${JSON.stringify(message, null, 2)}\n`
+    } else {
+      output = this.isProd ? message : color(message)
+    }
 
     const localeStringOptions = {
       year: 'numeric',
@@ -149,15 +154,20 @@ export class Logger implements BaseLogger {
       localeStringOptions
     );
 
-    const pidMessage = color(`[Storefront-API] ${process.pid}   - `);
-    const contextMessage = context === '' ? '' : isObject(context)
-      ? `\n${yellow('Object:')} ${inspect(context, { colors: true })}\n`
-      : yellow(context);
+    let contextMessage = context === '' ? '' : yellow(context)
+    if (isObject(context)) {
+      contextMessage = this.isProd
+        ? `\nObject: ${JSON.stringify(context)}\n`
+        : `\n${yellow('Object:')} ${inspect(context, { colors: true })}\n`
+    }
+
+    const pidMessage = this.isProd
+      ? `[Storefront-API] ${process.pid} - `
+      : color(`[Storefront-API] ${process.pid} - `)
+
     const timestampDiff = this.updateAndGetTimestampDiff(isTimeDiffEnabled);
 
-    process.stdout.write(
-      `${pidMessage}${timestamp}  ${output}${timestampDiff} ${contextMessage}\n`
-    );
+    console.log(`${pidMessage}${timestamp}  ${output}${timestampDiff} ${contextMessage}`)
   }
 
   private static updateAndGetTimestampDiff (
@@ -165,8 +175,11 @@ export class Logger implements BaseLogger {
   ): string {
     const includeTimestamp = Logger.lastTimestamp && isTimeDiffEnabled;
     const result = includeTimestamp
-      ? yellow(` +${Date.now() - Logger.lastTimestamp}ms`)
+      ? this.isProd
+        ? ` +${Date.now() - Logger.lastTimestamp}ms`
+        : yellow(` +${Date.now() - Logger.lastTimestamp}ms`)
       : '';
+
     Logger.lastTimestamp = Date.now();
     return result;
   }
@@ -175,7 +188,7 @@ export class Logger implements BaseLogger {
     if (!trace) {
       return;
     }
-    process.stdout.write(`${trace}\n`);
+    console.log(trace);
   }
 }
 
