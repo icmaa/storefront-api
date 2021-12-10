@@ -13,7 +13,8 @@ export interface BaseLogger {
 export type LogLevel = 'info' | 'error' | 'warn' | 'debug'
 
 export class Logger implements BaseLogger {
-  private static isProd: boolean = process.env.NODE_ENV === 'production'
+  private static isProd: boolean = process.env.NODE_CONFIG_ENV !== 'development'
+
   private static gaeMeta: any = {
     'logging.googleapis.com/labels': {
       module_id: process.env.GAE_SERVICE || '-',
