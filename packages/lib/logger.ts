@@ -24,7 +24,7 @@ export class Logger implements BaseLogger {
     }
   }
 
-  public static pino = pino(Logger.isProd
+  public static pino = pino(!Logger.isProd
     ? {}
     : {
       transport: {
@@ -40,7 +40,7 @@ export class Logger implements BaseLogger {
     }
   )
 
-  public error (message: any, trace = '', context?: string|Record<string, any>): void {
+  public error (message: any, trace?: any, context?: string|Record<string, any>): void {
     Logger.error(message, trace, context)
   }
 
@@ -60,9 +60,8 @@ export class Logger implements BaseLogger {
     Logger.printMessage('info', message, context)
   }
 
-  public static error (message: any, trace = '', context: string|Record<string, any> = ''): void {
-    this.printMessage('error', message, context)
-    this.printMessage('error', message, trace)
+  public static error (message: any, trace?: any, context?: string|Record<string, any>): void {
+    this.printMessage('error', message, trace || context)
   }
 
   public static warn (message: any, context: string|Record<string, any> = ''): void {
@@ -77,11 +76,19 @@ export class Logger implements BaseLogger {
   private static printMessage (level: LogLevel, msg: any, context: string|Record<string, any>): void {
     const log = { msg }
 
+    if (msg instanceof Error) {
+      Object.assign(log, { msg: msg.message, err: msg })
+    }
+
     if (process.env.GCLOUD_OPERATIONS_ENABLED) {
       Object.assign(log, { ...Logger.gaeMeta, severity: level })
     }
 
-    if (context) Object.assign(log, { context })
+    if (context instanceof Error) {
+      Object.assign(log, { err: context })
+    } else if (context) {
+      Object.assign(log, { context })
+    }
 
     Object.assign(log, { timeDiff: `+${Date.now() - Logger.lastTimestamp}ms` })
     Logger.lastTimestamp = Date.now()
