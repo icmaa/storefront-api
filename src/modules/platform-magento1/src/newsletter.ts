@@ -1,20 +1,20 @@
-import AbstractNewsletterProxy from '@storefront-api/platform-abstract/newsletter';
-import { multiStoreConfig } from './util';
+import AbstractNewsletterProxy from '@storefront-api/platform-abstract/newsletter'
+import { multiStoreConfig } from './util'
 
 class NewsletterProxy extends AbstractNewsletterProxy {
   public constructor (config, req) {
-    const Magento1Client = require('icmaa-magento1-vsbridge-client').default;
+    const Magento1Client = require('icmaa-magento1-vsbridge-client').default
     super(config, req)
-    this.api = Magento1Client(multiStoreConfig(config.magento1.api, req));
+    this.api = Magento1Client(multiStoreConfig(config.magento1.api, req))
   }
 
   public subscribe (emailAddress) {
-    return this.api.newsletter.subscribe(emailAddress);
+    return this.api.newsletter.subscribe(emailAddress)
   }
 
   public unsubscribe (customerToken) {
-    return this.api.newsletter.unsubscribe(customerToken);
+    return this.api.newsletter.unsubscribe(customerToken)
   }
 }
 
-export default NewsletterProxy;
+export default NewsletterProxy

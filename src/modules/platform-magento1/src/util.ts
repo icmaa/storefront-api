@@ -18,7 +18,7 @@ export function multiStoreConfig (apiConfig, req: Request): Record<string, any> 
       confCopy = Object.assign({}, magento1Config['api_' + storeCode]) // we're to use the specific api configuration - maybe even separate magento instance
     } else {
       if (new RegExp('/(' + config.get<string[]>('availableStores').join('|') + ')/', 'gm').exec(confCopy.url) === null) {
-        confCopy.url = (confCopy.url).replace(/(vsbridge)/gm, `${storeCode}/$1`);
+        confCopy.url = (confCopy.url).replace(/(vsbridge)/gm, `${storeCode}/$1`)
       }
     }
   } else {

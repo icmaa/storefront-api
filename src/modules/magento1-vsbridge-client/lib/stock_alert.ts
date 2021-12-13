@@ -1,16 +1,16 @@
 export default (restClient) => {
-  const module: any = {};
-  const urlPrefix = 'stockalert/';
-  let url = urlPrefix;
+  const module: any = {}
+  const urlPrefix = 'stockalert/'
+  let url = urlPrefix
   function getResponse (data) {
     if (data.code === 200) {
-      return data.result;
+      return data.result
     }
 
-    return false;
+    return false
   }
   module.subscribe = (customerToken, productId, emailAddress) => {
-    url += 'add';
+    url += 'add'
 
     if (typeof customerToken !== 'undefined' && customerToken) {
       url += `?token=${customerToken}`
@@ -25,8 +25,8 @@ export default (restClient) => {
     }
 
     return restClient.post(url, alertData).then((data) => {
-      return getResponse(data);
-    });
-  };
-  return module;
-};
+      return getResponse(data)
+    })
+  }
+  return module
+}

@@ -1,18 +1,18 @@
 export default (restClient) => {
-  const module: any = {};
-  const urlPrefix = 'stock/';
-  let url = urlPrefix;
+  const module: any = {}
+  const urlPrefix = 'stock/'
+  let url = urlPrefix
   function getResponse (data) {
     if (data.code === 200) {
-      return data.result;
+      return data.result
     }
-    return false;
+    return false
   }
   module.check = (sku) => {
-    url += `check?sku=${sku}`;
+    url += `check?sku=${sku}`
     return restClient.get(url).then((data) => {
-      return getResponse(data);
-    });
-  };
-  return module;
-};
+      return getResponse(data)
+    })
+  }
+  return module
+}

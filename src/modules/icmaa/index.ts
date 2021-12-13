@@ -1,8 +1,19 @@
 import * as path from 'path'
+
 import { StorefrontApiModule, registerExtensions } from '@storefront-api/lib/module'
 import { StorefrontApiContext } from '@storefront-api/lib/module/types'
+import registerLogger from './logger'
 import invalidate from './invalidate'
 import warmup from './warmup'
+
+// Import custom middlewares before the first route,
+// this often is a requirement for middlewares like `morgan`
+export const IcmaaMiddleware: StorefrontApiModule = new StorefrontApiModule({
+  key: 'icmaa-middleware',
+  beforeRegistration: (context: StorefrontApiContext): void => {
+    registerLogger(context)
+  }
+})
 
 export const IcmaaModule: StorefrontApiModule = new StorefrontApiModule({
   key: 'icmaa-module',

@@ -1,49 +1,49 @@
-import logger from './log'
+import Logger from '@storefront-api/lib/logger'
 import OAuth from 'oauth-1.0a'
 import request from 'request'
 
 export default (options) => {
-  const instance: any = {};
+  const instance: any = {}
 
-  const servelrUrl = options.url;
+  const servelrUrl = options.url
   const oauth = OAuth({
     consumer: {
       public: options.consumerKey,
       secret: options.consumerSecret
     },
     signature_method: 'HMAC-SHA1'
-  });
+  })
   const token = {
     public: options.accessToken,
     secret: options.accessTokenSecret
-  };
+  }
 
   function httpCallSucceeded (response) {
-    return response.statusCode >= 200 && response.statusCode < 300;
+    return response.statusCode >= 200 && response.statusCode < 300
   }
 
   function errorString (message, parameters) {
     if (parameters === null) {
-      return message;
+      return message
     }
     let parameterPlaceholder
     if (parameters instanceof Array) {
       for (let i = 0; i < parameters.length; i++) {
-        parameterPlaceholder = '%' + (i + 1).toString();
-        message = message.replace(parameterPlaceholder, parameters[i]);
+        parameterPlaceholder = '%' + (i + 1).toString()
+        message = message.replace(parameterPlaceholder, parameters[i])
       }
     } else if (parameters instanceof Object) {
       for (const key in parameters) {
-        parameterPlaceholder = '%' + key;
-        message = message.replace(parameterPlaceholder, parameters[key]);
+        parameterPlaceholder = '%' + key
+        message = message.replace(parameterPlaceholder, parameters[key])
       }
     }
 
-    return message;
+    return message
   }
 
   function createUrl (resourceUrl) {
-    return servelrUrl + '/' + resourceUrl;
+    return servelrUrl + '/' + resourceUrl
   }
 
   function apiCall (request_data, request_token = '') {
@@ -55,7 +55,7 @@ export default (options) => {
       body: request_data.body
     }
 
-    logger.info('Calling API endpoint', requestInfo)
+    Logger.debug('Calling API endpoint', requestInfo)
 
     /* eslint no-undef: off */
     return new Promise((resolve, reject) => {
@@ -74,7 +74,7 @@ export default (options) => {
         jar
       }, (error, response, body) => {
         if (error) {
-          logger.error('Error occured: ' + error)
+          Logger.error('Error occured: ' + error)
           reject(error)
 
           return
@@ -90,16 +90,16 @@ export default (options) => {
             errorMessage = body
           }
 
-          logger.error('API call failed with: ' + errorMessage, requestInfo)
+          Logger.error('API call failed with: ' + errorMessage, '', requestInfo)
           reject(errorMessage)
 
           return
         }
 
-        logger.info('API response received', requestInfo)
-        resolve(body);
-      });
-    });
+        Logger.debug('API response received', requestInfo)
+        resolve(body)
+      })
+    })
   }
 
   instance.consumerToken = function (login_data) {
@@ -114,8 +114,8 @@ export default (options) => {
     const request_data = {
       url: createUrl(resourceUrl),
       method: 'GET'
-    };
-    return apiCall(request_data, request_token);
+    }
+    return apiCall(request_data, request_token)
   }
 
   instance.post = function (resourceUrl, data, request_token = '') {
@@ -123,8 +123,8 @@ export default (options) => {
       url: createUrl(resourceUrl),
       method: 'POST',
       body: data
-    };
-    return apiCall(request_data, request_token);
+    }
+    return apiCall(request_data, request_token)
   }
 
   instance.put = function (resourceUrl, data, request_token = '') {
@@ -132,8 +132,8 @@ export default (options) => {
       url: createUrl(resourceUrl),
       method: 'PUT',
       body: data
-    };
-    return apiCall(request_data, request_token);
+    }
+    return apiCall(request_data, request_token)
   }
 
   instance.delete = function (resourceUrl, data, request_token = '') {
@@ -141,9 +141,9 @@ export default (options) => {
       url: createUrl(resourceUrl),
       method: 'DELETE',
       body: data
-    };
-    return apiCall(request_data, request_token);
+    }
+    return apiCall(request_data, request_token)
   }
 
-  return instance;
+  return instance
 }
