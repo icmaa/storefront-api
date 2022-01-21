@@ -6,7 +6,10 @@ export default function registerLogging ({ app: express, logger }: StorefrontApi
   morgan.token('gae-instance-id', () => process.env.GAE_INSTANCE || '-')
   morgan.token('gae-version', () => process.env.GAE_VERSION || '-')
   morgan.token('gae-service', () => process.env.GAE_SERVICE || '-')
-  morgan.token('gae-severity', (req, res) => res.statusCode < 400 ? 'INFO' : 'ERROR')
+  morgan.token(
+    'gae-severity',
+    (req, res) => res.statusCode < 400 ? 'INFO' : (res.statusCode < 500 ? 'WARNING' : 'ERROR')
+  )
 
   // API metrics
   morgan.token('cache', (req, res) => res.getHeader('x-vs-cache') || 'cache-none')
