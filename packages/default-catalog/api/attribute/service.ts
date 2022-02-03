@@ -35,15 +35,21 @@ function transformAggsToAttributeListParam (aggregations: Record<string, any>): 
   return attributeListParam
 }
 
+const cachedAttributes = {}
+
 /**
  * Returns attributes from cache
  */
 async function getAttributeFromCache (attributeCode: string, indexName: string, config) {
   if (config.server.useOutputCache && cache) {
     try {
-      const res = await cache.get(
-        `api:attribute-list:${indexName}:${attributeCode}`
-      )
+      if (cachedAttributes[`${indexName}:${attributeCode}`]) {
+        return cachedAttributes[`${indexName}:${attributeCode}`]
+      }
+
+      const res = await cache.get(`api:attribute-list:${indexName}:${attributeCode}`)
+      cachedAttributes[`${indexName}:${attributeCode}`] = res
+
       return res
     } catch (err) {
       console.error(err)
@@ -59,11 +65,14 @@ async function setAttributeInCache (attributeList, indexName: string, config: IC
   if (config.get<boolean>('server.useOutputCache') && cache) {
     try {
       await Promise.all(
-        attributeList.map(attribute => cache.set(
-          `api:attribute-list:${indexName}:${attribute.attribute_code}`,
-          attribute,
-          []
-        ))
+        attributeList.map(attribute => {
+          cachedAttributes[`${indexName}:${attribute.attribute_code}`] = attribute
+          return cache.set(
+            `api:attribute-list:${indexName}:${attribute.attribute_code}`,
+            attribute,
+            []
+          )
+        })
       )
     } catch (err) {
       console.error(err)
@@ -162,7 +171,7 @@ function transformToMetadata ({
   position,
   slug,
   options = []
-}): any {
+}: Record<string, any>): any {
   return {
     is_visible_on_front,
     is_visible,
