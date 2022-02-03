@@ -3,6 +3,7 @@ import * as path from 'path'
 import { StorefrontApiModule, registerExtensions } from '@storefront-api/lib/module'
 import { StorefrontApiContext } from '@storefront-api/lib/module/types'
 import registerLogger from './logger'
+import url from './url'
 import invalidate from './invalidate'
 import warmup from './warmup'
 
@@ -22,6 +23,8 @@ export const IcmaaModule: StorefrontApiModule = new StorefrontApiModule({
     const rootPath = path.join(__dirname, '..')
     const registeredExtensions: string[] = config.get('modules.icmaa.registeredExtensions')
     registerExtensions({ app, config, db, registeredExtensions, rootPath })
+
+    app.use('/api/icmaa-url', url({ config, db }))
 
     app.get('/api/invalidate/all', invalidate)
     app.get('/_ah/warmup', warmup)
