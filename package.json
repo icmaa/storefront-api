@@ -131,7 +131,6 @@
     "request-promise-native": "^1.0.5",
     "resource-router-middleware": "^0.6.0",
     "semver": "^7.3.5",
-    "sharp": "^0.29.0",
     "soap": "^0.25.0",
     "storefront-query-builder": "https://github.com/DivanteLtd/storefront-query-builder.git",
     "supertest": "^4.0.2",
