@@ -2,7 +2,13 @@ import path from 'path'
 import { IConfig } from 'config'
 import { FilterInterface } from 'storefront-query-builder'
 
+const allFilters: Record<string, Record<string, FilterInterface>> = {}
+
 export default async function loadModuleCustomFilters (config: IConfig, type = 'catalog'): Promise<Record<string, FilterInterface>> {
+  if (allFilters[type]) {
+    return allFilters[type]
+  }
+
   const filters: Record<string, FilterInterface> = {}
   const filterPromises: Promise<void>[] = []
 
@@ -25,5 +31,9 @@ export default async function loadModuleCustomFilters (config: IConfig, type = '
     }
   }
 
-  return Promise.all(filterPromises).then(() => filters)
+  return Promise.all(filterPromises)
+    .then(() => {
+      allFilters[type] = filters
+      return filters
+    })
 }

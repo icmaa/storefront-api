@@ -24,6 +24,7 @@ async function _cacheStorageHandler (config: IConfig, result: Record<string, any
       Logger.error(err)
     })
   }
+  return new Promise(resolve => resolve)
 }
 
 function _outputFormatter (responseBody: Record<string, any>, format = 'standard'): Record<string, any> {
@@ -187,7 +188,7 @@ export default ({ config }: ExtensionAPIFunctionParameter) => async function (re
 
             _resBody = _outputFormatter(_resBody, responseFormat)
 
-            _cacheStorageHandler(config, _resBody, reqHash, tagsArray)
+            await _cacheStorageHandler(config, _resBody, reqHash, tagsArray)
           }
 
           res.json(_resBody)
