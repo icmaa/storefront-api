@@ -24,7 +24,6 @@ async function _cacheStorageHandler (config: IConfig, result: Record<string, any
       Logger.error(err)
     })
   }
-  return new Promise(resolve => resolve)
 }
 
 function _outputFormatter (responseBody: Record<string, any>, format = 'standard'): Record<string, any> {
@@ -83,7 +82,7 @@ export default ({ config }: ExtensionAPIFunctionParameter) => async function (re
   }
 
   if (req.query.request_format === 'search-query') { // search query and not Elastic DSL - we need to translate it
-    const customFilters = await loadCustomFilters(config)
+    const customFilters = Object.assign({}, await loadCustomFilters(config))
     if (entityType !== '') {
       Object.assign(customFilters, await loadCustomFilters(config, entityType))
     }
