@@ -141,6 +141,64 @@ export default ({ config }: ExtensionAPIFunctionParameter): Router => {
     }).catch(e => apiStatus(res, 'Elasticsearch client: ' + e.message, 500))
   })
 
+  api.get('/attributes', async (req, res) => {
+    const query = adjustQuery({
+      index: config.get<string[]>('elasticsearch.indices')[0],
+      method: req.method
+    }, 'attribute', config)
+
+    return esClient(config).search({
+      ...query,
+      body: {
+        _source: ['attribute_code', 'id', 'frontend_label', 'position'],
+        size: 1000,
+        query: {
+          bool: {
+            must: [
+              { term: { is_visible_on_front: true } },
+              { term: { is_filterable: 1 } }
+            ]
+          }
+        }
+      }
+    }).then(response => {
+      const { body } = response
+      if (getTotals(body) === 0) {
+        return apiStatus(res, 'No attributes found', 400)
+      }
+
+      const attributes = getHits(response).map(i => i._source)
+
+      if (attributes) {
+        if (req.query.noneValue) {
+          attributes.unshift({
+            label: 'None',
+            value: req.query.noneValue,
+            sort_order: 0
+          })
+        }
+
+        switch (req.query.style) {
+          case 'storyblok': {
+            const { nameKey = 'frontend_label', valueKey = 'attribute_code', sortKey = 'position' } = req.query
+            return res.status(200).json(
+              new StoryblokConnector().createAttributeOptionArray({
+                options: attributes,
+                nameKey: (nameKey as string),
+                valueKey: (valueKey as string),
+                sortKey: (sortKey as string)
+              })
+            )
+          }
+          default:
+            return apiStatus(res, attributes, 200)
+        }
+      }
+
+      return apiStatus(res, 'No attribute values found', 400)
+    }).catch(e => apiStatus(res, 'Elasticsearch client: ' + e.message, 500))
+  })
+
   api.get('/categories', async (req, res) => {
     const query = adjustQuery({
       index: config.get<string[]>('elasticsearch.indices')[0],
