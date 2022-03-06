@@ -51,7 +51,7 @@ class StoryblokConnector {
 
         return fetch(`${baseUrl}/${endpoint}${querystring}`)
           .then(async (response) => {
-            const data = await response.json()
+            const data: any = await response.json()
             if (response.status !== 401) {
               return data
             }
