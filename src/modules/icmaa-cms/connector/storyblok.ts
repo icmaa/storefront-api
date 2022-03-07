@@ -3,7 +3,7 @@
 import config from 'config'
 
 import qs from 'qs'
-import fetch from 'node-fetch'
+import fetch from 'isomorphic-fetch'
 import cache from '@storefront-api/lib/cache-instance'
 
 import { objectKeysToCamelCase } from '../helpers/formatter'
