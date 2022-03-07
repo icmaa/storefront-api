@@ -1,5 +1,5 @@
 import config from 'config'
-import fetch from 'node-fetch'
+import fetch from 'isomorphic-fetch'
 import { RequestHandler } from 'express'
 import Logger from '@storefront-api/lib/logger'
 import cache from '@storefront-api/lib/cache-instance'

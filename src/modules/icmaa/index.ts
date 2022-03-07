@@ -26,7 +26,7 @@ export const IcmaaModule: StorefrontApiModule = new StorefrontApiModule({
 
     app.use('/api/icmaa-url', url({ config, db }))
 
-    app.use('/api/icmaa-invalidate', invalidate)
+    app.get('/api/icmaa-invalidate', invalidate)
     app.get('/api/icmaa-invalidate/all', invalidateAll)
 
     app.get('/_ah/warmup', warmup)
