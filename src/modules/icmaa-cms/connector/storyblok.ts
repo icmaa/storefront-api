@@ -3,7 +3,7 @@
 import config from 'config'
 
 import qs from 'qs'
-import fetch from 'node-fetch'
+import fetch from 'isomorphic-fetch'
 import cache from '@storefront-api/lib/cache-instance'
 
 import { objectKeysToCamelCase } from '../helpers/formatter'
@@ -51,7 +51,7 @@ class StoryblokConnector {
 
         return fetch(`${baseUrl}/${endpoint}${querystring}`)
           .then(async (response) => {
-            const data = await response.json()
+            const data: any = await response.json()
             if (response.status !== 401) {
               return data
             }

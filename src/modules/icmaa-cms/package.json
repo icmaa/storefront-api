@@ -16,9 +16,9 @@
   },
   "dependencies": {
     "commander": "^6.2.1",
+    "isomorphic-fetch": "^3.0.0",
     "marked": "^2.0.5",
-    "node-fetch": "^2.6.0",
-    "qs": "^6.9.1",
+    "qs": "^6.10.3",
     "storyblok-js-client": "^2.0.0",
     "yaml": "^1.10.0"
   },
