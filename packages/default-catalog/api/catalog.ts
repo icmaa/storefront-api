@@ -148,7 +148,7 @@ export default ({ config }: ExtensionAPIFunctionParameter) => async function (re
             const tagsArray = []
             const categoryTagsArray = []
 
-            if (config.get<boolean>('server.useOutputCache') && cache) {
+            if (config.get<boolean>('server.useOutputCacheTagging')) {
               const tagPrefix = entityType[0].toUpperCase() // first letter of entity name: P, T, A ...
               tagsArray.push(entityType)
               _resBody.hits.hits.forEach(item => {
