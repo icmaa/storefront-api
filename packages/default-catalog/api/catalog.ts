@@ -14,11 +14,11 @@ import { IConfig } from 'config'
 import bodybuilder from 'bodybuilder'
 import jwt from 'jwt-simple'
 
-async function _cacheStorageHandler (config: IConfig, result: Record<string, any>, hash: string, tags = []): Promise<void> {
+async function _cacheStorageHandler (config: IConfig, output: Record<string, any>, headers: Record<string, any>, hash: string, tags = []): Promise<void> {
   if (config.get<boolean>('server.useOutputCache') && cache) {
     return cache.set(
       'api:' + hash,
-      result,
+      { output, headers },
       tags
     ).catch((err) => {
       Logger.error(err)
@@ -187,7 +187,7 @@ export default ({ config }: ExtensionAPIFunctionParameter) => async function (re
 
             _resBody = _outputFormatter(_resBody, responseFormat)
 
-            await _cacheStorageHandler(config, _resBody, reqHash, tagsArray)
+            await _cacheStorageHandler(config, _resBody, res.getHeaders(), reqHash, tagsArray)
           }
 
           res.json(_resBody)
@@ -203,10 +203,11 @@ export default ({ config }: ExtensionAPIFunctionParameter) => async function (re
   if (config.get<boolean>('server.useOutputCache') && cache) {
     cache.get(
       'api:' + reqHash
-    ).then(output => {
-      if (output !== null) {
+    ).then(result => {
+      if (result !== null) {
+        Object.keys(result?.headers || {}).forEach(k => res.setHeader(k, result?.headers[k]))
         res.setHeader('x-vs-cache', 'hit')
-        res.json(output)
+        res.json(result.output)
         Logger.debug(`Cache hit [${req.url}], cached request: ${Date.now() - s}ms`)
       } else {
         res.setHeader('x-vs-cache', 'miss')
@@ -215,6 +216,7 @@ export default ({ config }: ExtensionAPIFunctionParameter) => async function (re
       }
     }).catch(err => Logger.error(err))
   } else {
+    res.setHeader('x-vs-cache', 'disabled')
     dynamicRequestHandler()
   }
 }
