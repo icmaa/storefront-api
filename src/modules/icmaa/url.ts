@@ -50,10 +50,10 @@ const checkFieldValueEquality = ({ config, result, value }) => {
 export default ({ config }: ExtensionAPIFunctionParameter): Router => {
   const router = Router()
 
-  async function _cacheStorageHandler (config: IConfig, result: Record<string, any>, hash: string, tags = []): Promise<void> {
+  async function _cacheStorageHandler (config: IConfig, result: Record<string, any>, cacheKey: string, tags = []): Promise<void> {
     if (config.get<boolean>('server.useOutputCache') && cache) {
       return cache.set(
-        'api:' + hash,
+        cacheKey,
         result,
         tags
       ).catch((err) => {
@@ -69,8 +69,11 @@ export default ({ config }: ExtensionAPIFunctionParameter): Router => {
       return apiStatus(res, 'Missing url', 500)
     }
 
+    const storeCode = getCurrentStoreCode(req)
+    const cacheKey = `api:${storeCode || 'default'}:${url}`
+
     if (config.get<boolean>('server.useOutputCache') && cache) {
-      const isCached = await cache.get('api:' + url)
+      const isCached = await cache.get(cacheKey)
         .then(output => {
           if (output !== null) {
             res.setHeader('x-vs-cache', 'hit')
@@ -91,7 +94,7 @@ export default ({ config }: ExtensionAPIFunctionParameter): Router => {
       if (isCached) return
     }
 
-    const indexName = getCurrentStoreView(getCurrentStoreCode(req)).elasticsearch.index
+    const indexName = getCurrentStoreView(storeCode).elasticsearch.index
     const index = getIndexNamesByTypes({ indexName, config })
     const body = await buildQuery({ value: url, config })
     const esQuery = {
@@ -122,7 +125,7 @@ export default ({ config }: ExtensionAPIFunctionParameter): Router => {
           .process(esResponse.body.hits.hits, null)
           .then(async pResult => {
             pResult = pResult.map(h => Object.assign(h, { _score: h._score }))
-            await _cacheStorageHandler(config, pResult[0], url, tagsArray)
+            await _cacheStorageHandler(config, pResult[0], cacheKey, tagsArray)
             return res.json(pResult[0])
           }).catch((err) => {
             console.error(err)
