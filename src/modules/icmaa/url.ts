@@ -50,11 +50,11 @@ const checkFieldValueEquality = ({ config, result, value }) => {
 export default ({ config }: ExtensionAPIFunctionParameter): Router => {
   const router = Router()
 
-  async function _cacheStorageHandler (config: IConfig, result: Record<string, any>, hash: string, tags = []): Promise<void> {
+  async function _cacheStorageHandler (config: IConfig, output: Record<string, any>, headers: Record<string, any>, cacheKey: string, tags = []): Promise<void> {
     if (config.get<boolean>('server.useOutputCache') && cache) {
       return cache.set(
-        'api:' + hash,
-        result,
+        cacheKey,
+        { output, headers },
         tags
       ).catch((err) => {
         Logger.error(err)
@@ -69,13 +69,19 @@ export default ({ config }: ExtensionAPIFunctionParameter): Router => {
       return apiStatus(res, 'Missing url', 500)
     }
 
+    const storeCode = getCurrentStoreCode(req)
+    const cacheKey = `api:${storeCode || 'default'}:${url}`
+
     if (config.get<boolean>('server.useOutputCache') && cache) {
-      const isCached = await cache.get('api:' + url)
-        .then(output => {
-          if (output !== null) {
+      const isCached = await cache.get(cacheKey)
+        .then(result => {
+          if (result !== null) {
+            Object.keys(result?.headers || {}).forEach(k => res.setHeader(k, result?.headers[k]))
             res.setHeader('x-vs-cache', 'hit')
+            res.json(result.output)
+
             Logger.debug(`Cache hit [${req.url}], cached request: ${Date.now() - s}ms`)
-            res.json(output)
+
             return true
           } else {
             res.setHeader('x-vs-cache', 'miss')
@@ -89,9 +95,11 @@ export default ({ config }: ExtensionAPIFunctionParameter): Router => {
         })
 
       if (isCached) return
+    } else {
+      res.setHeader('x-vs-cache', 'disabled')
     }
 
-    const indexName = getCurrentStoreView(getCurrentStoreCode(req)).elasticsearch.index
+    const indexName = getCurrentStoreView(storeCode).elasticsearch.index
     const index = getIndexNamesByTypes({ indexName, config })
     const body = await buildQuery({ value: url, config })
     const esQuery = {
@@ -118,11 +126,16 @@ export default ({ config }: ExtensionAPIFunctionParameter): Router => {
         const tagPrefix = result._type[0].toUpperCase()
         tagsArray.push(`${tagPrefix}${result?._id}`)
 
+        if (config.get<boolean>('server.useOutputCacheTagging')) {
+          const cacheTags = tagsArray.join(' ')
+          res.setHeader('x-vs-cache-tags', cacheTags)
+        }
+
         resultProcessor
           .process(esResponse.body.hits.hits, null)
           .then(async pResult => {
             pResult = pResult.map(h => Object.assign(h, { _score: h._score }))
-            await _cacheStorageHandler(config, pResult[0], url, tagsArray)
+            await _cacheStorageHandler(config, pResult[0], res.getHeaders(), cacheKey, tagsArray)
             return res.json(pResult[0])
           }).catch((err) => {
             console.error(err)
