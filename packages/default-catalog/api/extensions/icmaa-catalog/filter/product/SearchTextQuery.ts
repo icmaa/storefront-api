@@ -53,7 +53,14 @@ const filter: FilterInterface = {
     const multiMatchConfig = getMultiMatchConfig(this.config, value)
     newQueryChain = getMultimatchQuery(newQueryChain, searchableAttributes, multiMatchConfig)
 
-    newQueryChain.orQuery('match_phrase', 'sku', { query: value, boost: 1 })
+    // Add search-alias for each word in query
+    value.split(' ').forEach(w => {
+      // We could add fuzzines but the results are kind of unpredictable
+      // e.g. { ... fuzziness: 1, prefix_length: 3 }
+      newQueryChain.orQuery('match', 'search_alias', { query: w, boost: 1.5 })
+    })
+
+    newQueryChain.orQuery('match_phrase', 'sku', { query: value, boost: 2 })
 
     const functionScore = getFunctionScores(this.config)
     if (functionScore) {
