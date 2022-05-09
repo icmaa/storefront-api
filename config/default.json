@@ -34,30 +34,22 @@
     "apiVersion": "7.2",
     "cacheRequest": false,
     "searchScoring": {
-      "attributes": {
-        "attribute_code": {
-          "scoreValues": { "attribute_value": { "weight": 1 } }
-        }
-      },
-      "fuzziness": 2,
-      "cutoff_frequency":  0.01,
-      "max_expansions": 3,
-      "minimum_should_match": "75%",
-      "prefix_length": 2,
+      "attributes": {},
       "boost_mode": "multiply",
       "score_mode": "multiply",
       "max_boost": 100,
       "function_min_score": 1
     },
+    "multimatchConfig": {
+      "type": "best_fields",
+      "fuzziness": 0.5,
+      "prefix_length": 2,
+      "max_expansions": 3,
+      "minimum_should_match": "75%"
+    },
     "searchableAttributes": {
       "name": {
         "boost": 4
-      },
-      "sku": {
-        "boost": 2
-      },
-      "category.name": {
-        "boost": 1
       }
     }    
   },  
