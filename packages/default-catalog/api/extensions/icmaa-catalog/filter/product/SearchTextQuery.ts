@@ -25,15 +25,14 @@ const getMultimatchQuery = (queryChain: any, fields: any[], multiMatchConfig: an
   return queryChain
 }
 
+/**
+ * This is a modified copy of the `applyTextQuery()` method in `storefront-query-builder/src/elasticsearch/body.ts`.
+ * We added support for mutlimatch the nested category property and refactored the config. See `README.md` for more info.
+ */
 const filter: FilterInterface = {
   priority: 1,
   check: ({ attribute }) => ['search-text', 'search-text-plain'].includes(attribute),
   filter ({ queryChain, value, attribute }) {
-    /**
-     * This is a modified copy of the `applyTextQuery()` method in `storefront-query-builder/src/elasticsearch/body.ts`.
-     * We added support for mutlimatch the nested category property. See `README.md` for more info.
-     */
-
     if (value === '' || !value) {
       return queryChain
     }
