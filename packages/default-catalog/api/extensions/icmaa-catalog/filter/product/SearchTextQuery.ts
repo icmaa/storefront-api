@@ -35,7 +35,7 @@ const getMultimatchQuery = (queryChain: any, fields: MultiMatchItem, multiMatchC
   })
 
   if (andFields.length > 0) {
-    queryChain.orQuery('multi_match', 'fields', andFields, Object.assign(multiMatchConfig, { query, operator: 'and' }))
+    queryChain.orQuery('multi_match', 'fields', andFields, { ...multiMatchConfig, query, operator: 'and' })
   }
 
   return queryChain
