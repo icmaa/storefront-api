@@ -51,7 +51,7 @@
       "name": {
         "boost": 4
       }
-    }    
+    }
   },  
   "products": {
     "fieldsToCompress": ["max_regular_price", "max_price", "max_regular_price", "minimal_regular_price", "final_price", "price", "special_price", "original_final_price", "original_price", "original_special_price", "final_price_incl_tax", "price_incl_tax", "special_price_incl_tax", "final_price_tax", "price_tax", "special_price_tax", "image", "small_image", "thumbnail"],

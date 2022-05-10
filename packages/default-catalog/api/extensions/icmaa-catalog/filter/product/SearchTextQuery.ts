@@ -1,42 +1,26 @@
-import { forEach } from 'lodash'
+import { omit } from 'lodash'
 import { FilterInterface } from 'storefront-query-builder'
 import getFunctionScores from 'storefront-query-builder/lib/elasticsearch/score'
 
-interface MultiMatchItem {
-  operator: 'or'|'and',
-  [key: string]: { boost: number } | MultiMatchItem | any
-}
-
-const getMultimatchQuery = (queryChain: any, fields: MultiMatchItem, multiMatchConfig: any, query: string, nestedPath?: string): any => {
-  nestedPath = nestedPath ? nestedPath + '.' : ''
-  const orFields = []
-  const andFields = []
-
-  forEach(fields, (field, path) => {
-    if (field.boost !== undefined) {
-      const fieldName = nestedPath + path + '^' + field.boost
-
-      if (field.operator === 'and') {
-        andFields.push(fieldName)
-      } else {
-        orFields.push(fieldName)
-      }
-    } else {
-      queryChain.orQuery('nested', { path: nestedPath + path }, nestedQueryChain =>
-        getMultimatchQuery(nestedQueryChain, field, multiMatchConfig, query, nestedPath + path)
+const getMultimatchQuery = (queryChain: any, fields: any[], multiMatchConfig: any, query: string, parents = []): any => {
+  fields.forEach(field => {
+    if (field.nested !== undefined) {
+      parents.push(field.nested)
+      const path = parents.join('.')
+      queryChain.orQuery('nested', { path }, nestedQueryChain =>
+        getMultimatchQuery(nestedQueryChain, field.fields, multiMatchConfig, query, parents)
       )
+    } else {
+      const mappedParentFields = field.fields.map(f => parents.length > 0 ? parents.join('.') + `.${f}` : f)
+      if (field.operator === 'and') {
+        queryChain.orQuery('multi_match', 'fields', mappedParentFields, { ...multiMatchConfig, ...omit(field, 'fields'), query })
+      } else {
+        query.split(' ').forEach(word => {
+          queryChain.orQuery('multi_match', 'fields', mappedParentFields, { ...multiMatchConfig, ...omit(field, 'fields'), query: word })
+        })
+      }
     }
   })
-
-  query.split(' ').forEach(word => {
-    if (orFields.length > 0) {
-      queryChain.orQuery('multi_match', 'fields', orFields, { ...multiMatchConfig, query: word })
-    }
-  })
-
-  if (andFields.length > 0) {
-    queryChain.orQuery('multi_match', 'fields', andFields, { ...multiMatchConfig, query, operator: 'and' })
-  }
 
   return queryChain
 }
@@ -56,7 +40,7 @@ const filter: FilterInterface = {
 
     let newQueryChain = this.bodybuilder()
 
-    const searchableAttributes: MultiMatchItem = this.config.elasticsearch?.searchableAttributes || { name: { boost: 1 } }
+    const searchableAttributes: any[] = this.config.elasticsearch?.icmaaSearchableAttributes || [{ fields: 'name^1' }]
     const multiMatchConfig = this.config.elasticsearch.multimatchConfig
     newQueryChain = getMultimatchQuery(newQueryChain, searchableAttributes, multiMatchConfig, value)
     newQueryChain.orQuery('match_phrase', 'sku', { query: value, boost: 2 })
