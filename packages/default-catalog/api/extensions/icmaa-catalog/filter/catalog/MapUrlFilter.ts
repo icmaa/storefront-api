@@ -13,6 +13,20 @@ const filter: FilterInterface = {
       queryChain.orFilter('match_phrase', field, { query: value })
     })
 
+    // Filter in-active child-categories
+    queryChain.filter('bool', subQueryChain => {
+      return subQueryChain
+        .orFilter('bool', isCategoryQueryChain => {
+          return isCategoryQueryChain
+            .filter('term', 'is_active', true)
+            .filter('wildcard', '_index', { value: '*_category_*' })
+        })
+        .orFilter('bool', isProductQueryChain => {
+          return isProductQueryChain.notFilter('wildcard', '_index', { value: '*_category_*' })
+        })
+        .filterMinimumShouldMatch(1)
+    })
+
     queryChain
       .filterMinimumShouldMatch(1)
       .size(1)
