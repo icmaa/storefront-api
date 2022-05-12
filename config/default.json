@@ -44,8 +44,7 @@
       "type": "best_fields",
       "fuzziness": 0.5,
       "prefix_length": 2,
-      "max_expansions": 3,
-      "minimum_should_match": "75%"
+      "max_expansions": 3
     },
     "searchableAttributes": {
       "name": {
