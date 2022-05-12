@@ -57,9 +57,9 @@ const filter: FilterInterface = {
     if (!attribute.endsWith('plain')) {
       this.queryChain.agg('nested', { path: 'category' }, 'categories_found', b => {
         const options = { size: 50, order: [{ max_score: 'desc' }, { _count: 'desc' }] }
-        return b.agg('terms', 'category.category_id', options, 'categories', c => {
+        return b.agg('terms', 'category.id', options, 'categories', c => {
           return c.agg('max', { script: '_score' }, 'max_score')
-            .agg('top_hits', { _source: ['category.name', 'category.category_id', 'category.position'], size: 1 }, 'hits')
+            .agg('top_hits', { _source: ['category.name', 'category.id', 'category.search_alias'], size: 1 }, 'hits')
         })
       })
     }
