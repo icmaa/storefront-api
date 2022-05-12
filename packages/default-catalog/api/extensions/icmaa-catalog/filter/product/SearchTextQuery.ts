@@ -15,9 +15,18 @@ const getMultimatchQuery = (queryChain: any, fields: any[], multiMatchConfig: an
       if (field.operator === 'and') {
         queryChain.orQuery('multi_match', 'fields', mappedParentFields, { ...multiMatchConfig, ...omit(field, 'fields'), query })
       } else {
-        query.split(' ').forEach(word => {
-          queryChain.orQuery('multi_match', 'fields', mappedParentFields, { ...multiMatchConfig, ...omit(field, 'fields'), query: word })
-        })
+        const words = query.split(' ')
+        if (words.length > 1) {
+          // If more than one word, put it in sub-bool-query to force all words to be necessary
+          queryChain.orQuery('bool', subQuery => {
+            words.forEach(word => {
+              subQuery.query('multi_match', 'fields', mappedParentFields, { ...multiMatchConfig, ...omit(field, 'fields'), query: word })
+            })
+            return subQuery
+          })
+        } else {
+          queryChain.orQuery('multi_match', 'fields', mappedParentFields, { ...multiMatchConfig, ...omit(field, 'fields'), query })
+        }
       }
     }
   })
@@ -42,8 +51,9 @@ const filter: FilterInterface = {
     const searchableAttributes: any[] = this.config.elasticsearch?.icmaaSearchableAttributes || [{ fields: 'name^1' }]
     const multiMatchConfig = this.config.elasticsearch.multimatchConfig
     newQueryChain = getMultimatchQuery(newQueryChain, searchableAttributes, multiMatchConfig, value)
-    newQueryChain.orQuery('match_phrase', 'sku', { query: value, boost: 2 })
     newQueryChain.queryMinimumShouldMatch(1, true)
+
+    newQueryChain.orQuery('multi_match', 'fields', ['_id', 'sku'], { type: 'phrase', query: value, boost: 10 })
 
     const functionScore = getFunctionScores(this.config)
     if (functionScore) {
