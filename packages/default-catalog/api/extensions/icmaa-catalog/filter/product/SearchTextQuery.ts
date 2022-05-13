@@ -15,7 +15,7 @@ const getMultimatchQuery = (queryChain: any, fields: any[], multiMatchConfig: an
       if (field.operator === 'and') {
         queryChain.orQuery('multi_match', 'fields', mappedParentFields, { ...multiMatchConfig, ...omit(field, 'fields'), query })
       } else {
-        const words = query.split(' ')
+        const words = query.split(' ').filter(Boolean) // Filter emtpy strings by multiple whitespaces
         if (words.length > 1) {
           // If more than one word, put it in sub-bool-query to force all words to be necessary
           queryChain.orQuery('bool', subQuery => {
@@ -41,6 +41,7 @@ const getMultimatchQuery = (queryChain: any, fields: any[], multiMatchConfig: an
 const filter: FilterInterface = {
   priority: 1,
   check: ({ attribute }) => ['search-text', 'search-text-plain'].includes(attribute),
+  mutator: (value) => Object.values(value)[0][0].trim(),
   filter ({ queryChain, value, attribute }) {
     if (value === '' || !value) {
       return queryChain
@@ -75,8 +76,7 @@ const filter: FilterInterface = {
     }
 
     return this.queryChain
-  },
-  mutator: (value) => Object.values(value)[0][0]
+  }
 }
 
 export default filter
