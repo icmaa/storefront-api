@@ -1,65 +1,66 @@
+import { omit } from 'lodash'
 import { FilterInterface } from 'storefront-query-builder'
-import { forEach, pick, omit } from 'lodash'
-import getMultiMatchConfig from 'storefront-query-builder/lib/elasticsearch/multimatch'
 import getFunctionScores from 'storefront-query-builder/lib/elasticsearch/score'
 
-interface MultiMatchItem {
-  operator: 'or'|'and',
-  [key: string]: { boost: number } | MultiMatchItem | any
-}
-
-const multiMatchConfigFields: string[] = ['operator', 'fuzziness', 'cutoff_frequency', 'max_expansions',
-  'prefix_length', 'minimum_should_match', 'tie_breaker', 'analyzer']
-
-const getMultimatchQuery = (queryChain: any, fields: MultiMatchItem, multiMatchConfig: any, nestedPath?: string): any => {
-  nestedPath = nestedPath ? nestedPath + '.' : ''
-  const readyFields = []
-  forEach(fields, (value, path) => {
-    if (value.boost !== undefined) {
-      readyFields.push(nestedPath + path + '^' + value.boost)
-    } else {
-      const nestedMultiMatchConfig = Object.assign({}, multiMatchConfig, pick(fields[path], multiMatchConfigFields))
-      queryChain.orQuery('nested', { path: nestedPath + path }, nestedQueryChain =>
-        getMultimatchQuery(nestedQueryChain, omit(fields[path], multiMatchConfigFields) as MultiMatchItem, nestedMultiMatchConfig, nestedPath + path)
+const getMultimatchQuery = (queryChain: any, fields: any[], multiMatchConfig: any, query: string, parents = []): any => {
+  fields.forEach(field => {
+    if (field.nested !== undefined) {
+      parents.push(field.nested)
+      const path = parents.join('.')
+      queryChain.orQuery('nested', { path }, nestedQueryChain =>
+        getMultimatchQuery(nestedQueryChain, field.fields, multiMatchConfig, query, parents)
       )
+    } else {
+      const mappedParentFields = field.fields.map(f => parents.length > 0 ? parents.join('.') + `.${f}` : f)
+      if (field.operator === 'and') {
+        queryChain.orQuery('multi_match', 'fields', mappedParentFields, { ...multiMatchConfig, ...omit(field, 'fields'), query })
+      } else {
+        const words = query.split(' ').filter(Boolean) // Filter emtpy strings by multiple whitespaces
+        if (words.length > 1) {
+          // If more than one word, put it in sub-bool-query to force all words to be necessary
+          queryChain.orQuery('bool', subQuery => {
+            words.forEach(word => {
+              subQuery.query('multi_match', 'fields', mappedParentFields, { ...multiMatchConfig, ...omit(field, 'fields'), query: word })
+            })
+            return subQuery
+          })
+        } else {
+          queryChain.orQuery('multi_match', 'fields', mappedParentFields, { ...multiMatchConfig, ...omit(field, 'fields'), query })
+        }
+      }
     }
   })
-
-  if (readyFields.length > 0) {
-    queryChain.orQuery('multi_match', 'fields', readyFields, multiMatchConfig)
-  }
 
   return queryChain
 }
 
+/**
+ * This is a modified copy of the `applyTextQuery()` method in `storefront-query-builder/src/elasticsearch/body.ts`.
+ * We added support for mutlimatch the nested category property and refactored the config. See `README.md` for more info.
+ */
 const filter: FilterInterface = {
   priority: 1,
   check: ({ attribute }) => ['search-text', 'search-text-plain'].includes(attribute),
+  mutator: (value) => Object.values(value)[0][0].trim(),
   filter ({ queryChain, value, attribute }) {
-    /**
-     * This is a modified copy of the `applyTextQuery()` method in `storefront-query-builder/src/elasticsearch/body.ts`.
-     * We added support for mutlimatch the nested category property. See `README.md` for more info.
-     */
-
     if (value === '' || !value) {
       return queryChain
     }
 
     let newQueryChain = this.bodybuilder()
 
-    const searchableAttributes: MultiMatchItem = this.config.elasticsearch.searchableAttributes !== undefined
-      ? this.config.elasticsearch.searchableAttributes : { name: { boost: 1 } }
+    const searchableAttributes: any[] = this.config.elasticsearch?.icmaaSearchableAttributes || [{ fields: 'name^1' }]
+    const multiMatchConfig = this.config.elasticsearch.multimatchConfig
+    newQueryChain = getMultimatchQuery(newQueryChain, searchableAttributes, multiMatchConfig, value)
+    newQueryChain.queryMinimumShouldMatch(1, true)
 
-    const multiMatchConfig = getMultiMatchConfig(this.config, value)
-    newQueryChain = getMultimatchQuery(newQueryChain, searchableAttributes, multiMatchConfig)
-
-    newQueryChain.orQuery('match_phrase', 'sku', { query: value, boost: 1 })
+    newQueryChain.orQuery('multi_match', 'fields', ['_id', 'sku'], { type: 'phrase', query: value, boost: 10 })
 
     const functionScore = getFunctionScores(this.config)
     if (functionScore) {
       this.queryChain.query('function_score', functionScore, () => newQueryChain)
     } else {
-      this.queryChain.query('bool', newQueryChain)
+      this.queryChain = newQueryChain
     }
 
     // Add category-aggregation using `nested` and `top-hits` to get all possible categories in results for category filter
@@ -67,16 +68,15 @@ const filter: FilterInterface = {
     if (!attribute.endsWith('plain')) {
       this.queryChain.agg('nested', { path: 'category' }, 'categories_found', b => {
         const options = { size: 50, order: [{ max_score: 'desc' }, { _count: 'desc' }] }
-        return b.agg('terms', 'category.category_id', options, 'categories', c => {
+        return b.agg('terms', 'category.id', options, 'categories', c => {
           return c.agg('max', { script: '_score' }, 'max_score')
-            .agg('top_hits', { _source: ['category.name', 'category.category_id', 'category.position'], size: 1 }, 'hits')
+            .agg('top_hits', { _source: ['category.name', 'category.id', 'category.search_alias'], size: 1 }, 'hits')
         })
       })
     }
 
     return this.queryChain
-  },
-  mutator: (value) => Object.values(value)[0][0]
+  }
 }
 
 export default filter
