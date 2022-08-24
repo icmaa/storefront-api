@@ -35,6 +35,8 @@ export const extractPluginValues = async <T>(object: Record<string, any>): Promi
                   })
               )
             }
+          } else if (v.plugin === 'icmaa-rte') {
+            object[key] = new StoryblokClient({}).richTextResolver.render(object[key])
           }
         }
       } else if (v.type === 'doc') {

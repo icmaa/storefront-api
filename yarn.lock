@@ -863,14 +863,6 @@
     "@babel/types" "^7.4.4"
     esutils "^2.0.2"
 
-"@babel/runtime-corejs3@^7.4.5":
-  version "7.12.5"
-  resolved "https://registry.yarnpkg.com/@babel/runtime-corejs3/-/runtime-corejs3-7.12.5.tgz#ffee91da0eb4c6dae080774e94ba606368e414f4"
-  integrity sha512-roGr54CsTmNPPzZoCP1AmDXuBoNao7tnSA83TXTwt+UK5QVyh1DIJnrgYRPWKCF2flqZQXwa7Yr8v7VmLzF0YQ==
-  dependencies:
-    core-js-pure "^3.0.0"
-    regenerator-runtime "^0.13.4"
-
 "@babel/runtime@^7.11.0", "@babel/runtime@^7.8.4", "@babel/runtime@^7.9.2":
   version "7.12.5"
   resolved "https://registry.yarnpkg.com/@babel/runtime/-/runtime-7.12.5.tgz#410e7e487441e1b360c29be715d870d9b985882e"
@@ -4630,11 +4622,6 @@ core-js-compat@^3.6.5, core-js-compat@^3.7.0:
   dependencies:
     browserslist "^4.15.0"
     semver "7.0.0"
-
-core-js-pure@^3.0.0:
-  version "3.8.1"
-  resolved "https://registry.yarnpkg.com/core-js-pure/-/core-js-pure-3.8.1.tgz#23f84048f366fdfcf52d3fd1c68fec349177d119"
-  integrity sha512-Se+LaxqXlVXGvmexKGPvnUIYC1jwXu1H6Pkyb3uBM5d8/NELMYCHs/4/roD7721NxrTLyv7e5nXd5/QLBO+10g==
 
 core-js@^2.4.0:
   version "2.6.12"
@@ -12489,7 +12476,7 @@ qs@^6.10.3:
   dependencies:
     side-channel "^1.0.4"
 
-qs@^6.5.1, qs@^6.5.2, qs@^6.7.0:
+qs@^6.5.1, qs@^6.7.0:
   version "6.9.4"
   resolved "https://registry.yarnpkg.com/qs/-/qs-6.9.4.tgz#9090b290d1f91728d3c22e54843ca44aea5ab687"
   integrity sha512-A1kFqHekCTM7cz0udomYUoYNWjBebHm/5wzU/XqrBRBNWectVH0QIiN+NEcZ0Dte5hvzHwbr8+XQmguPhJ6WdQ==
@@ -14055,14 +14042,10 @@ stealthy-require@^1.1.1:
     "@typescript-eslint/parser" "^2.26.0"
     clone-deep "^4.0.1"
 
-storyblok-js-client@^2.0.0:
-  version "2.5.2"
-  resolved "https://registry.yarnpkg.com/storyblok-js-client/-/storyblok-js-client-2.5.2.tgz#37cc4017f173a59e57c1c061a380efb26441c468"
-  integrity sha512-EfRrQS6XQTsjyaRtlxpbfgw1AVc3OHSP4UrkCUHYeCug7XtFxZGI9+iHPLyUBDny21WjancJ9YqrEGGAIUT/SA==
-  dependencies:
-    "@babel/runtime-corejs3" "^7.4.5"
-    axios "^0.19.0"
-    qs "^6.5.2"
+storyblok-js-client@^4.5.6:
+  version "4.5.6"
+  resolved "https://registry.yarnpkg.com/storyblok-js-client/-/storyblok-js-client-4.5.6.tgz#caab0bb1ead8618f84afcc35be9305883d85e628"
+  integrity sha512-S0cXKkEqGDibD32K48FFodjeu/+eF++nrHhrLzo/bKxrnyQiPChPccFAnzsJCQ6uMvRuVGZzjKwM5/sMeBRthg==
 
 stream-browserify@^2.0.1:
   version "2.0.2"
