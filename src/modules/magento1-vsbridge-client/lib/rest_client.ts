@@ -5,7 +5,9 @@ import request from 'request'
 export default (options) => {
   const instance: any = {}
 
-  const servelrUrl = options.url
+  const serverUrl = options.url
+  const auth = options.auth ? { auth: options.auth } : {}
+
   const oauth = OAuth({
     consumer: {
       public: options.consumerKey,
@@ -13,6 +15,7 @@ export default (options) => {
     },
     signature_method: 'HMAC-SHA1'
   })
+
   const token = {
     public: options.accessToken,
     secret: options.accessTokenSecret
@@ -43,14 +46,19 @@ export default (options) => {
   }
 
   function createUrl (resourceUrl) {
-    return servelrUrl + '/' + resourceUrl
+    return serverUrl + '/' + resourceUrl
   }
 
   function apiCall (request_data, request_token = '') {
+    const authToken = request_token
+      ? { Authorization: 'Bearer ' + request_token }
+      : { ...oauth.toHeader(oauth.authorize(request_data, token)) }
+
     const requestInfo = {
       url: request_data.url,
       method: request_data.method,
-      headers: request_token ? { Authorization: 'Bearer ' + request_token } : oauth.toHeader(oauth.authorize(request_data, token)),
+      ...auth,
+      headers: { ...auth, ...authToken },
       json: true,
       body: request_data.body
     }
@@ -68,7 +76,8 @@ export default (options) => {
       request({
         url: request_data.url,
         method: request_data.method,
-        headers: request_token ? { Authorization: 'Bearer ' + request_token } : oauth.toHeader(oauth.authorize(request_data, token)),
+        ...auth,
+        headers: { ...authToken },
         json: true,
         body: request_data.body,
         jar

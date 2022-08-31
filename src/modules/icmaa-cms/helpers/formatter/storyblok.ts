@@ -1,8 +1,7 @@
 import pick from 'lodash/pick'
 import forEach from 'lodash/forEach'
 import config from 'config'
-import StoryblokClient from 'storyblok-js-client'
-// import marked from 'marked'
+import RichTextResolver from './storyblok/richTextResolver'
 
 const pluginMap: Record<string, any>[] = config.get('extensions.icmaaCms.storyblok.pluginFieldMap')
 const metaFieldsToTransport = [{ id: 'story_id' }, { name: 'uname' }, 'uuid', 'published_at', 'created_at', 'first_published_at']
@@ -14,6 +13,8 @@ const marked = (string, options) => {
   if (!staticMarked) staticMarked = require('marked/lib/marked.js')
   return staticMarked(string, options)
 }
+
+const rtResolver = new RichTextResolver()
 
 export const extractPluginValues = async <T>(object: Record<string, any>): Promise<Record<string, any>> => {
   for (const key in object) {
@@ -35,10 +36,12 @@ export const extractPluginValues = async <T>(object: Record<string, any>): Promi
                   })
               )
             }
+          } else if (v.plugin === 'icmaa-rte') {
+            object[key] = rtResolver.render(object[key])
           }
         }
       } else if (v.type === 'doc') {
-        object[key] = new StoryblokClient({}).richTextResolver.render(object[key])
+        object[key] = rtResolver.render(object[key])
       } else if (Array.isArray(v) && v.some(c => c._uid !== undefined)) {
         for (const subObjectIndex in v.filter(c => c._uid !== undefined)) {
           v[subObjectIndex] = await extractPluginValues(v[subObjectIndex])
