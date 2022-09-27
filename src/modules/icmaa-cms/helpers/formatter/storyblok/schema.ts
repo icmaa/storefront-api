@@ -1,20 +1,8 @@
-const pick = function (attrs, allowed) {
-  if (!attrs) {
-    return null
-  }
-  const h = {}
-  for (const key in attrs) {
-    const value = attrs[key]
-    if (allowed.indexOf(key) > -1 && value !== null) {
-      h[key] = value
-    }
-  }
-  return h
-}
+import { pick, snakeCase } from 'lodash'
 
 const isEmailLinkType = (type) => type === 'email'
 
-export default {
+const schema = {
   nodes: {
     horizontalRule (): any {
       return {
@@ -143,3 +131,15 @@ export default {
     }
   }
 }
+
+const polyfillCamelCaseNamesToSnakeCase = function (items: Record<string, any>): void {
+  for (const key in items) {
+    const scKey = snakeCase(key)
+    if (key !== scKey) items[scKey] = items[key]
+  }
+}
+
+polyfillCamelCaseNamesToSnakeCase(schema.nodes)
+polyfillCamelCaseNamesToSnakeCase(schema.marks)
+
+export default schema
