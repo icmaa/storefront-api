@@ -11,7 +11,7 @@
     "docker-compose.yml"
   ],
   "service": "app",
-  "workspaceFolder": "/var/www",
+  "workspaceFolder": "/workspace",
   "extensions": [
     "christian-kohler.npm-intellisense",
     "christian-kohler.path-intellisense",
