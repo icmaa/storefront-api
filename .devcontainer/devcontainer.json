@@ -11,16 +11,14 @@
     "docker-compose.yml"
   ],
   "service": "app",
-  "workspaceFolder": "/var/www",
+  "workspaceFolder": "/workspace",
   "extensions": [
     "christian-kohler.npm-intellisense",
     "christian-kohler.path-intellisense",
     "dbaeumer.vscode-eslint",
     "dotjoshjohnson.xml",
-    "eamodio.gitlens",
     "esbenp.prettier-vscode",
     "mechatroner.rainbow-csv",
-    "ms-vscode.js-debug-nightly",
     "redhat.vscode-yaml",
     "ria.elastic",
     "visualstudioexptteam.vscodeintellicode",
