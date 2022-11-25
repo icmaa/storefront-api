@@ -24,7 +24,7 @@
     "docs:build": "vuepress build docs",
     "docs:deploy": "yarn docs:build && now --prod docs",
     "start": "cross-env NODE_ENV=production node dist/src/index.js",
-    "start:pm2": "cross-env NODE_ENV=production pm2-runtime -i 1 dist/src/index.js",
+    "start:pm2": "cross-env NODE_ENV=production pm2-runtime -i 4 dist/src/index.js",
     "start:inspect": "node --inspect dist/src/index.js",
     "db7": "cross-env TS_NODE_PROJECT=\"tsconfig.json\" && ts-node -r tsconfig-paths/register scripts/db7.ts",
     "cache": "cross-env TS_NODE_PROJECT=\"tsconfig.json\" && ts-node -r tsconfig-paths/register ./scripts/cache",
