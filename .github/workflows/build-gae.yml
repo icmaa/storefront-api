@@ -1,6 +1,12 @@
-name: Continuous Delivery
+name: Continuous Delivery (GAE)
 
 on:
+  workflow_dispatch:
+    inputs:
+      BUILD_SUFFIX:
+        description: Build suffix
+        default: '-123'
+        required: true
   push:
     branches:
       - master
@@ -48,10 +54,7 @@ jobs:
       - name: Install
         uses: bahmutov/npm-install@v1
 
-      - name: Install dependencies
-        run: yarn
-
-      - name: Build "${{ env.APP }}"
+      - name: Build
         run: yarn build
         env:
           NODE_CONFIG_ENV: ${{ env.ENV }}
