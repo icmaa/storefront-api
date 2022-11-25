@@ -1,4 +1,4 @@
-name: Continuous Delivery (GAE)
+name: Continuous Delivery (SC)
 
 on:
   workflow_dispatch:
