@@ -54,7 +54,7 @@ jobs:
       - name: Install
         uses: bahmutov/npm-install@v1
 
-      - name: Build "${{ env.APP }}"
+      - name: Build
         run: yarn build
         env:
           NODE_CONFIG_ENV: ${{ env.ENV }}
