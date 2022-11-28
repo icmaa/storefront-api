@@ -60,10 +60,14 @@ jobs:
           NODE_CONFIG_ENV: ${{ env.ENV }}
           NODE_APP_INSTANCE: ${{ matrix.env.MANDANT }}
 
-      - id: deploy
-        uses: google-github-actions/deploy-appengine@main
+      - name: Authenticate to GCP
+        uses: 'google-github-actions/auth@v1'
         with:
-          credentials: ${{ env.ENV == 'production' && secrets.GCP_VSF_SA_KEY_PROD || secrets.GCP_VSF_SA_KEY_TEST }}
+          credentials_json: ${{ env.ENV == 'production' && secrets.GCP_VSF_SA_KEY_PROD || secrets.GCP_VSF_SA_KEY_TEST }}
+
+      - name: Deploy
+        uses: google-github-actions/deploy-appengine@v1
+        with:
           deliverables: app-${{ matrix.env.MANDANT }}-${{ env.ENV == 'production' && 'prod' || 'test' }}.yaml
           version: ${{ env.VERSION_NAME }}
           # promote: ${{ env.ENV == 'production' && 'false' || 'true' }}
