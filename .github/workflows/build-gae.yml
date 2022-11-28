@@ -60,7 +60,7 @@ jobs:
           NODE_CONFIG_ENV: ${{ env.ENV }}
           NODE_APP_INSTANCE: ${{ matrix.env.MANDANT }}
 
-      - name: Authenticate to Google Cloud
+      - name: Authenticate to GCP
         uses: 'google-github-actions/auth@v1'
         with:
           credentials_json: ${{ env.ENV == 'production' && secrets.GCP_VSF_SA_KEY_PROD || secrets.GCP_VSF_SA_KEY_TEST }}
