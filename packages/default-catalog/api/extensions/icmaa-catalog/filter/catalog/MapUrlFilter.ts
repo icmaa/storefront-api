@@ -6,11 +6,16 @@ const searchFields: string[] = config.get('urlModule.map.searchedFields') || []
 const filter: FilterInterface = {
   priority: 1,
   check: ({ attribute }) => attribute === 'mapUrl',
-  filter: ({ value, queryChain }) => {
+  filter ({ value, queryChain }) {
     if (!value) return queryChain
 
     searchFields.forEach(field => {
-      queryChain.orFilter('match_phrase', field, { query: value })
+      queryChain.orFilter('term', field, value)
+
+      const nestedSubcategoryQuery = this.bodybuilder()
+        .query('term', 'genericSubcategories.' + field, value)
+        .build()
+      queryChain.orFilter('nested', { path: 'genericSubcategories', ...nestedSubcategoryQuery })
     })
 
     // Filter in-active child-categories
