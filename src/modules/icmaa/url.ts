@@ -38,15 +38,6 @@ const addResultTypeByIndexName = ({ result, indexName }) => {
   return result
 }
 
-const checkFieldValueEquality = ({ config, result, value }) => {
-  /**
-   * Checks result equality because ES can return record even if searched
-   * value is not EXACLY what we want (check `match_phrase` in ES docs).
-   */
-  return get(config, 'urlModule.map.searchedFields', [])
-    .some(f => result._source[f] === value)
-}
-
 export default ({ config }: ExtensionAPIFunctionParameter): Router => {
   const router = Router()
 
@@ -102,6 +93,7 @@ export default ({ config }: ExtensionAPIFunctionParameter): Router => {
     const indexName = getCurrentStoreView(storeCode).elasticsearch.index
     const index = getIndexNamesByTypes({ indexName, config })
     const body = await buildQuery({ value: url, config })
+
     const esQuery = {
       index,
       _source_includes: includeFields ? includeFields.concat(get(config, 'urlModule.map.includeFields', [])) : [],
@@ -113,7 +105,7 @@ export default ({ config }: ExtensionAPIFunctionParameter): Router => {
       const esResponse = await getElasticClient(config).search(esQuery)
       let result = getHits(esResponse)[0]
 
-      if (result && checkFieldValueEquality({ config, result, value: url })) {
+      if (result) {
         result = addResultTypeByIndexName({ result, indexName })
 
         const factory = new ProcessorFactory(config)
