@@ -10,7 +10,7 @@ const filter: FilterInterface = {
     if (!value) return queryChain
 
     searchFields.forEach(field => {
-      queryChain.orFilter('term', field + '.keyword', value)
+      queryChain.orFilter('match_phrase', field, value)
     })
 
     // Filter in-active child-categories
