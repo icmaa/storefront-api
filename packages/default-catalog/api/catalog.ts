@@ -70,14 +70,19 @@ export default ({ config }: ExtensionAPIFunctionParameter) => async function (re
   if (urlSegments.length < 2) { throw new Error('No index name given in the URL. Please do use following URL format: /api/catalog/<index_name>/<entity_type>_search') } else {
     indexName = urlSegments[1]
 
-    if (urlSegments.length > 2) { entityType = urlSegments[2] }
+    try {
+      if (urlSegments.length > 2) { entityType = urlSegments[2] }
 
-    if (config.get<string[]>('elasticsearch.indices').indexOf(indexName) < 0) {
-      throw new Error('Invalid / inaccessible index name given in the URL. Please do use following URL format: /api/catalog/<index_name>/_search')
-    }
+      if (config.get<string[]>('elasticsearch.indices').indexOf(indexName) < 0) {
+        throw new Error('Invalid / inaccessible index name given in the URL. Please do use following URL format: /api/catalog/<index_name>/_search')
+      }
 
-    if (urlSegments[urlSegments.length - 1].indexOf('_search') !== 0) {
-      throw new Error('Please do use following URL format: /api/catalog/<index_name>/_search')
+      if (urlSegments[urlSegments.length - 1].indexOf('_search') !== 0) {
+        throw new Error('Please do use following URL format: /api/catalog/<index_name>/_search')
+      }
+    } catch (err) {
+      apiError(res, err)
+      return
     }
   }
 
