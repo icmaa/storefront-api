@@ -6,11 +6,11 @@ const searchFields: string[] = config.get('urlModule.map.searchedFields') || []
 const filter: FilterInterface = {
   priority: 1,
   check: ({ attribute }) => attribute === 'mapUrl',
-  filter: ({ value, queryChain }) => {
+  filter ({ value, queryChain }) {
     if (!value) return queryChain
 
     searchFields.forEach(field => {
-      queryChain.orFilter('match_phrase', field, { query: value })
+      queryChain.orFilter('match_phrase', field, value)
     })
 
     // Filter in-active child-categories
@@ -21,14 +21,14 @@ const filter: FilterInterface = {
             .filter('term', 'is_active', true)
             .filter('wildcard', '_index', { value: '*_category_*' })
         })
-        .orFilter('bool', isProductQueryChain => {
-          return isProductQueryChain.notFilter('wildcard', '_index', { value: '*_category_*' })
+        .orFilter('bool', noCategoryQueryChain => {
+          return noCategoryQueryChain.notFilter('wildcard', '_index', { value: '*_category_*' })
         })
         .filterMinimumShouldMatch(1)
     })
 
     queryChain
-      .filterMinimumShouldMatch(1)
+      .filterMinimumShouldMatch(1, true)
       .size(1)
 
     return queryChain
