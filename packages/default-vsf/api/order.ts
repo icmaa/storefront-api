@@ -111,7 +111,7 @@ export default ({ config, db }) => resource({
     Logger.info(JSON.stringify(incomingOrder))
 
     for (const product of req.body.products) {
-      const key = config.tax.calculateServerSide ? { priceInclTax: product.priceInclTax, id: null, sku: null } : { price: product.price, id: null, sku: null }
+      const key = config.tax.calculateServerSide === true ? { priceInclTax: product.priceInclTax, id: null, sku: null } : { price: product.price, id: null, sku: null }
       if (config.tax.alwaysSyncPlatformPricesOver) {
         key.id = product.id
       } else {
