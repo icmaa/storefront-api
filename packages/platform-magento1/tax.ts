@@ -84,7 +84,7 @@ class TaxProxy extends AbstractTaxProxy {
     return new Promise((resolve, reject) => {
       this.applyTierPrices(productList, groupId)
 
-      if (this._config.get('tax.calculateServerSide')) {
+      if (this._config.get('tax.calculateServerSide') === true) {
         const client = es.getClient(this._config)
         const esQuery = es.adjustQuery({
           index: this._indexName,
