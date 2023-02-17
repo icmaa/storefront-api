@@ -5,7 +5,7 @@ class TaxProxy extends AbstractTaxProxy {
   private readonly _deprecatedPriceFieldsSupport: any
   private readonly _taxCountry: any
   private readonly _taxRegion: any
-  private _taxClasses: any
+  private _taxClasses: any = []
 
   public constructor (config, entityType, indexName, taxCountry, taxRegion = '', sourcePriceInclTax = null, finalPriceInclTax = null) {
     super(config)
