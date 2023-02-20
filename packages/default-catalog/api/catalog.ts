@@ -1,4 +1,4 @@
-import { getClient as esClient, adjustQuery, adjustQueryParams, getHits, getTotals } from '@storefront-api/lib/elastic'
+import { getClient as esClient, adjustQuery, adjustQueryParams, adjustIndexName, getHits, getTotals } from '@storefront-api/lib/elastic'
 import { elasticsearch, SearchQuery, ElasticsearchQueryConfig } from 'storefront-query-builder'
 import { apiError } from '@storefront-api/lib/util'
 import { Router, Request, Response } from 'express'
@@ -35,7 +35,7 @@ function _outputFormatter (responseBody: Record<string, any>, format = 'standard
       delete responseBody.hits.max_score
       responseBody.total = getTotals(responseBody)
       responseBody.hits = responseBody.hits.hits.map(hit => {
-        return Object.assign(hit._source, { _score: hit._score })
+        return Object.assign(hit._source, { _score: hit._score, _sort: hit.sort })
       })
     }
   }
@@ -100,6 +100,25 @@ export default ({ config }: ExtensionAPIFunctionParameter) => async function (re
     })
   }
 
+  let pit: boolean|{ id: string, keep_alive: string } = req.query.pit ? { id: req.query.pit as string, keep_alive: '1m' } : false
+  if (req.query.pit === '') {
+    delete req.query.pit
+    pit = await esClient(config)
+      .openPointInTime({
+        index: adjustIndexName(indexName, entityType, config),
+        keep_alive: '1m'
+      })
+      .then((resp) => {
+        return { id: resp.body.id, keep_alive: '1m' }
+      })
+      .catch(resp => {
+        console.error('Couldn\'t fetch point-in-time for ', indexName, resp.message)
+        return false
+      })
+  } else {
+    delete req.query.pit
+  }
+
   if (req.query.response_format) responseFormat = req.query.response_format as string
 
   // Decode token and get group id
@@ -131,6 +150,11 @@ export default ({ config }: ExtensionAPIFunctionParameter) => async function (re
       method: req.method,
       body: requestBody
     }, entityType, config)
+
+    if (pit) {
+      delete query.index
+      query.body.pit = pit
+    }
 
     esClient(config)
       .search(Object.assign(query, reqQueryParams))
