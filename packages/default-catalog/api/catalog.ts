@@ -100,7 +100,7 @@ export default ({ config }: ExtensionAPIFunctionParameter) => async function (re
     })
   }
 
-  let pit: boolean|{ id: string, keep_alive: string } = req.query.pit ? { id: req.query.pit as string, keep_alive: '1m' } : false
+  let pit: { id: string, keep_alive: string } = req.query.pit ? { id: req.query.pit as string, keep_alive: '1m' } : null
   if (req.query.pit === '') {
     delete req.query.pit
     pit = await esClient(config)
@@ -113,7 +113,7 @@ export default ({ config }: ExtensionAPIFunctionParameter) => async function (re
       })
       .catch(resp => {
         console.error('Couldn\'t fetch point-in-time for ', indexName, resp.message)
-        return false
+        return null
       })
   } else {
     delete req.query.pit
@@ -140,7 +140,7 @@ export default ({ config }: ExtensionAPIFunctionParameter) => async function (re
   delete requestBody.groupId
 
   const s = Date.now()
-  const reqHash = sha3_224(`${JSON.stringify(requestBody)}${req.url}`)
+  const reqHash = sha3_224(`${JSON.stringify(requestBody)}${req.url}${pit?.id || ''}`)
   const dynamicRequestHandler = () => {
     const reqQuery = Object.assign({}, req.query)
     const reqQueryParams = adjustQueryParams(reqQuery, entityType, config)
