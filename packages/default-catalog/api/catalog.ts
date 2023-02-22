@@ -13,6 +13,7 @@ import { sha3_224 } from 'js-sha3'
 import { IConfig } from 'config'
 import bodybuilder from 'bodybuilder'
 import jwt from 'jwt-simple'
+import pick from 'lodash/pick'
 
 async function _cacheStorageHandler (config: IConfig, output: Record<string, any>, headers: Record<string, any>, hash: string, tags = []): Promise<void> {
   if (config.get<boolean>('server.useOutputCache') && cache) {
@@ -67,18 +68,23 @@ export default ({ config }: ExtensionAPIFunctionParameter) => async function (re
 
   let indexName = ''
   let entityType = ''
-  if (urlSegments.length < 2) { throw new Error('No index name given in the URL. Please do use following URL format: /api/catalog/<index_name>/<entity_type>_search') } else {
+  let action = ''
+  if (urlSegments.length < 2) {
+    throw new Error('No index name given in the URL. Please do use following URL format:  /api/catalog/<index_name>/<entity_type>/<_search|_count>/')
+  } else {
     indexName = urlSegments[1]
 
     try {
       if (urlSegments.length > 2) { entityType = urlSegments[2] }
 
       if (config.get<string[]>('elasticsearch.indices').indexOf(indexName) < 0) {
-        throw new Error('Invalid / inaccessible index name given in the URL. Please do use following URL format: /api/catalog/<index_name>/_search')
+        throw new Error('Invalid / inaccessible index name given in the URL. Please do use following URL format:  /api/catalog/<index_name>/<entity_type>/<_search|_count>/')
       }
 
-      if (urlSegments[urlSegments.length - 1].indexOf('_search') !== 0) {
-        throw new Error('Please do use following URL format: /api/catalog/<index_name>/_search')
+      const lastSegment = urlSegments[urlSegments.length - 1]
+      action = lastSegment.replace(/^(.*)\?.*/gm, '$1')
+      if (!['_search', '_count'].includes(action)) {
+        throw new Error('Please do use following URL format: /api/catalog/<index_name>/<entity_type>/<_search|_count>/')
       }
     } catch (err) {
       apiError(res, err)
@@ -150,6 +156,22 @@ export default ({ config }: ExtensionAPIFunctionParameter) => async function (re
       method: req.method,
       body: requestBody
     }, entityType, config)
+
+    if (action === '_count') {
+      const countRequest = pick(Object.assign(query, reqQueryParams), ['index', 'method', 'body'])
+      delete countRequest?.body?.sort
+
+      return esClient(config)
+        .count(countRequest)
+        .then(async response => {
+          const _resBody = pick(response.body, ['count'])
+          await _cacheStorageHandler(config, _resBody, res.getHeaders(), reqHash, [])
+          res.json(_resBody)
+        })
+        .catch(err => {
+          apiError(res, err)
+        })
+    }
 
     if (pit) {
       delete query.index
