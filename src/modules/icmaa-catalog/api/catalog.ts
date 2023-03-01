@@ -1,18 +1,19 @@
-import { getClient as esClient, adjustQuery, adjustQueryParams, getHits, getTotals } from '@storefront-api/lib/elastic'
+import { getClient as esClient, adjustQuery, adjustQueryParams, adjustIndexName, getHits, getTotals } from '@storefront-api/lib/elastic'
 import { elasticsearch, SearchQuery, ElasticsearchQueryConfig } from 'storefront-query-builder'
-import { apiError } from '@storefront-api/lib/util'
 import { Router, Request, Response } from 'express'
+import { apiError } from '@storefront-api/lib/util'
 import { ExtensionAPIFunctionParameter } from '@storefront-api/lib/module'
 import cache from '@storefront-api/lib/cache-instance'
 import Logger from '@storefront-api/lib/logger'
-import AttributeService from './attribute/service'
-import ProcessorFactory from '../processor/factory'
-import loadCustomFilters from '../helper/loadCustomFilters'
-import { sha3_224 } from 'js-sha3'
+import AttributeService from '@storefront-api/default-catalog/api/attribute/service'
+import ProcessorFactory from '@storefront-api/default-catalog/processor/factory'
+import loadCustomFilters from 'icmaa-catalog/helper/loadCustomFilters'
 
 import { IConfig } from 'config'
+import { sha3_224 } from 'js-sha3'
 import bodybuilder from 'bodybuilder'
 import jwt from 'jwt-simple'
+import pick from 'lodash/pick'
 
 async function _cacheStorageHandler (config: IConfig, output: Record<string, any>, headers: Record<string, any>, hash: string, tags = []): Promise<void> {
   if (config.get<boolean>('server.useOutputCache') && cache) {
@@ -35,7 +36,7 @@ function _outputFormatter (responseBody: Record<string, any>, format = 'standard
       delete responseBody.hits.max_score
       responseBody.total = getTotals(responseBody)
       responseBody.hits = responseBody.hits.hits.map(hit => {
-        return Object.assign(hit._source, { _score: hit._score })
+        return Object.assign(hit._source, { _score: hit._score, _sort: hit.sort })
       })
     }
   }
@@ -67,18 +68,23 @@ export default ({ config }: ExtensionAPIFunctionParameter) => async function (re
 
   let indexName = ''
   let entityType = ''
-  if (urlSegments.length < 2) { throw new Error('No index name given in the URL. Please do use following URL format: /api/catalog/<index_name>/<entity_type>_search') } else {
+  let action = ''
+  if (urlSegments.length < 2) {
+    throw new Error('No index name given in the URL. Please do use following URL format:  /api/catalog/<index_name>/<entity_type>/<_search|_count>/')
+  } else {
     indexName = urlSegments[1]
 
     try {
       if (urlSegments.length > 2) { entityType = urlSegments[2] }
 
       if (config.get<string[]>('elasticsearch.indices').indexOf(indexName) < 0) {
-        throw new Error('Invalid / inaccessible index name given in the URL. Please do use following URL format: /api/catalog/<index_name>/_search')
+        throw new Error('Invalid / inaccessible index name given in the URL. Please do use following URL format:  /api/catalog/<index_name>/<entity_type>/<_search|_count>/')
       }
 
-      if (urlSegments[urlSegments.length - 1].indexOf('_search') !== 0) {
-        throw new Error('Please do use following URL format: /api/catalog/<index_name>/_search')
+      const lastSegment = urlSegments[urlSegments.length - 1]
+      action = lastSegment.replace(/^(.*)\?.*/gm, '$1')
+      if (!['_search', '_count'].includes(action)) {
+        throw new Error('Please do use following URL format: /api/catalog/<index_name>/<entity_type>/<_search|_count>/')
       }
     } catch (err) {
       apiError(res, err)
@@ -98,6 +104,25 @@ export default ({ config }: ExtensionAPIFunctionParameter) => async function (re
       searchQuery: new SearchQuery(requestBody),
       customFilters
     })
+  }
+
+  let pit: { id: string, keep_alive: string } = req.query.pit ? { id: req.query.pit as string, keep_alive: '1m' } : null
+  if (req.query.pit === '') {
+    delete req.query.pit
+    pit = await esClient(config)
+      .openPointInTime({
+        index: adjustIndexName(indexName, entityType, config),
+        keep_alive: '1m'
+      })
+      .then((resp) => {
+        return { id: resp.body.id, keep_alive: '1m' }
+      })
+      .catch(resp => {
+        console.error('Couldn\'t fetch point-in-time for ', indexName, resp.message)
+        return null
+      })
+  } else {
+    delete req.query.pit
   }
 
   if (req.query.response_format) responseFormat = req.query.response_format as string
@@ -121,7 +146,7 @@ export default ({ config }: ExtensionAPIFunctionParameter) => async function (re
   delete requestBody.groupId
 
   const s = Date.now()
-  const reqHash = sha3_224(`${JSON.stringify(requestBody)}${req.url}`)
+  const reqHash = sha3_224(`${JSON.stringify(requestBody)}${req.url}${pit?.id || ''}`)
   const dynamicRequestHandler = () => {
     const reqQuery = Object.assign({}, req.query)
     const reqQueryParams = adjustQueryParams(reqQuery, entityType, config)
@@ -131,6 +156,27 @@ export default ({ config }: ExtensionAPIFunctionParameter) => async function (re
       method: req.method,
       body: requestBody
     }, entityType, config)
+
+    if (action === '_count') {
+      const countRequest = pick(Object.assign(query, reqQueryParams), ['index', 'method', 'body'])
+      delete countRequest?.body?.sort
+
+      return esClient(config)
+        .count(countRequest)
+        .then(async response => {
+          const _resBody = pick(response.body, ['count'])
+          await _cacheStorageHandler(config, _resBody, res.getHeaders(), reqHash, [])
+          res.json(_resBody)
+        })
+        .catch(err => {
+          apiError(res, err)
+        })
+    }
+
+    if (pit) {
+      delete query.index
+      query.body.pit = pit
+    }
 
     esClient(config)
       .search(Object.assign(query, reqQueryParams))

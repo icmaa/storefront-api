@@ -4,7 +4,7 @@ import { RequestHandler } from 'express'
 import Logger from '@storefront-api/lib/logger'
 import cache from '@storefront-api/lib/cache-instance'
 import { apiStatus } from '@storefront-api/lib/util'
-import { ioRedis } from './helpers/redis'
+import { ioRedis } from 'icmaa/helpers/redis'
 
 export const invalidate: RequestHandler = async (req, res) => {
   if (config.get('server.useOutputCache')) {

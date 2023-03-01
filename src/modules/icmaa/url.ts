@@ -3,7 +3,7 @@ import { getClient as getElasticClient, getHits } from '@storefront-api/lib/elas
 import { apiStatus, getCurrentStoreView, getCurrentStoreCode } from '@storefront-api/lib/util'
 import cache from '@storefront-api/lib/cache-instance'
 import Logger from '@storefront-api/lib/logger'
-import loadCustomFilters from '@storefront-api/default-catalog/helper/loadCustomFilters'
+import loadCustomFilters from 'icmaa-catalog/helper/loadCustomFilters'
 import ProcessorFactory from '@storefront-api/default-catalog/processor/factory'
 
 import { Router } from 'express'
