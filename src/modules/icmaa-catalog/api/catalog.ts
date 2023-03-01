@@ -104,6 +104,8 @@ export default ({ config }: ExtensionAPIFunctionParameter) => async function (re
       searchQuery: new SearchQuery(requestBody),
       customFilters
     })
+
+    console.log(JSON.stringify(requestBody))
   }
 
   let pit: { id: string, keep_alive: string } = req.query.pit ? { id: req.query.pit as string, keep_alive: '1m' } : null
