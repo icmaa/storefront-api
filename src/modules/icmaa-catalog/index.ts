@@ -1,7 +1,7 @@
 import { StorefrontApiModule, registerExtensions } from '@storefront-api/lib/module/index'
 import { StorefrontApiContext } from '@storefront-api/lib/module/types'
 import { invalidate, invalidateAll } from 'icmaa-catalog/api/invalidate'
-import catalog from '@storefront-api/default-catalog/api/catalog'
+import catalog from 'icmaa-catalog/api/catalog'
 
 import defaultProcessor from '@storefront-api/default-catalog/processor/default'
 import productProcessor from '@storefront-api/default-catalog/processor/product'
