@@ -93,12 +93,12 @@ export default ({ config }: ExtensionAPIFunctionParameter) => async function (re
   }
 
   if (req.query.request_format === 'search-query') { // search query and not Elastic DSL - we need to translate it
-    const customFilters = Object.assign({}, await loadCustomFilters(config))
+    const customFilters = Object.assign({}, loadCustomFilters())
     if (entityType !== '') {
-      Object.assign(customFilters, await loadCustomFilters(config, entityType))
+      Object.assign(customFilters, loadCustomFilters(entityType))
     }
 
-    requestBody = await elasticsearch.buildQueryBodyFromSearchQuery({
+    requestBody = elasticsearch.buildQueryBodyFromSearchQuery({
       config: config as ElasticsearchQueryConfig,
       queryChain: bodybuilder(),
       searchQuery: new SearchQuery(requestBody),

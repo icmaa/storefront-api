@@ -1,4 +1,3 @@
-import { IConfig } from 'config'
 import { FilterInterface } from 'storefront-query-builder'
 
 import ActiveByDateRangeFilter from 'icmaa-catalog/api/filter/catalog/ActiveByDateRangeFilter'
@@ -38,11 +37,7 @@ const allFilters: Record<string, Record<string, FilterInterface>> = {
  * very slow despite the search on the filesystem. As we don't need a dynamic
  * import for that, we just call them statically instead and save a lot of time
  * on the first calls.
- *
- * @param config
- * @param type
- * @returns
  */
-export default async function loadModuleCustomFilters (config: IConfig, type = 'catalog'): Promise<Record<string, FilterInterface>> {
+export default function loadModuleCustomFilters (type = 'catalog'): Record<string, FilterInterface> {
   return allFilters[type] || {}
 }
