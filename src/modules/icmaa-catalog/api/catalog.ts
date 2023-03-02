@@ -98,7 +98,7 @@ export default ({ config }: ExtensionAPIFunctionParameter) => async function (re
       Object.assign(customFilters, loadCustomFilters(entityType))
     }
 
-    requestBody = elasticsearch.buildQueryBodyFromSearchQuery({
+    requestBody = await elasticsearch.buildQueryBodyFromSearchQuery({
       config: config as ElasticsearchQueryConfig,
       queryChain: bodybuilder(),
       searchQuery: new SearchQuery(requestBody),
