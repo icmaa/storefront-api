@@ -13,7 +13,7 @@ import bodybuilder from 'bodybuilder'
 import get from 'lodash/get'
 
 const buildQuery = async ({ config, value }) => {
-  const customFilters = await loadCustomFilters(config)
+  const customFilters = Object.assign({}, loadCustomFilters())
 
   const query = new SearchQuery()
     .applyFilter({ key: 'mapUrl', value })
@@ -93,6 +93,8 @@ export default ({ config }: ExtensionAPIFunctionParameter): Router => {
     const indexName = getCurrentStoreView(storeCode).elasticsearch.index
     const index = getIndexNamesByTypes({ indexName, config })
     const body = await buildQuery({ value: url, config })
+
+    console.log(JSON.stringify(body))
 
     const esQuery = {
       index,
