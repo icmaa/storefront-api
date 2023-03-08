@@ -3,7 +3,7 @@ import { apiStatus, apiError } from '@storefront-api/lib/util'
 import { ExtensionAPIFunctionParameter } from '@storefront-api/lib/module'
 import PlatformFactory from '@storefront-api/platform/factory'
 import AbstractUserProxy from '@storefront-api/platform-abstract/user'
-import { merge } from 'lodash'
+import merge from 'lodash/merge'
 
 import { newMagentoClientAction } from 'icmaa/helpers'
 import GoogleRecaptcha from 'icmaa/helpers/googleRecaptcha'

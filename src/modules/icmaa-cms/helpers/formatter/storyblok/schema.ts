@@ -1,4 +1,5 @@
-import { pick, snakeCase } from 'lodash'
+import pick from 'lodash/pick'
+import snakeCase from 'lodash/snakeCase'
 
 const isEmailLinkType = (type) => type === 'email'
 

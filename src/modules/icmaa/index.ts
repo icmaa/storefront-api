@@ -4,7 +4,6 @@ import { StorefrontApiModule, registerExtensions } from '@storefront-api/lib/mod
 import { StorefrontApiContext } from '@storefront-api/lib/module/types'
 import registerLogger from './logger'
 import url from './url'
-import { invalidate, invalidateAll } from './invalidate'
 import warmup from './warmup'
 
 // Import custom middlewares before the first route,
@@ -25,9 +24,6 @@ export const IcmaaModule: StorefrontApiModule = new StorefrontApiModule({
     registerExtensions({ app, config, db, registeredExtensions, rootPath })
 
     app.use('/api/icmaa-url', url({ config, db }))
-
-    app.get('/api/icmaa-invalidate', invalidate)
-    app.get('/api/icmaa-invalidate/all', invalidateAll)
 
     app.get('/_ah/warmup', warmup)
   }
