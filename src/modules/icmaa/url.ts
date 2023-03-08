@@ -94,8 +94,6 @@ export default ({ config }: ExtensionAPIFunctionParameter): Router => {
     const index = getIndexNamesByTypes({ indexName, config })
     const body = await buildQuery({ value: url, config })
 
-    console.log(JSON.stringify(body))
-
     const esQuery = {
       index,
       _source_includes: includeFields ? includeFields.concat(get(config, 'urlModule.map.includeFields', [])) : [],
