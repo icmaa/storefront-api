@@ -1,0 +1,19 @@
+{
+  "name": "icmaa-catalog",
+  "version": "1.0.0",
+  "main": "index.js",
+  "author": "cewald <c.ewald@impericon.com> and contributors",
+  "license": "MIT",
+  "private": true,
+  "dependencies": {
+    "@storefront-api/lib": "^1.0.0-rc.3",
+    "@storefront-api/platform": "^1.0.0-rc.3",
+    "bodybuilder": "^2.2.21",
+    "config": "^1.30.0",
+    "js-sha3": "^0.8.0",
+    "jwt-simple": "^0.5.1",
+    "lodash": "^4.17.10",
+    "request": "^2.85.0",
+    "storefront-query-builder": "https://github.com/DivanteLtd/storefront-query-builder.git"
+  }
+}

@@ -49,9 +49,9 @@ class ProductProcessor extends ProcessorAbstract {
 
       // compact price fields
       if (this._req.query.response_format === 'compact') {
+        const fieldsToCompress = this._config.get('products.fieldsToCompress')
+        const fieldsToCompact = this._config.get('products.fieldsToCompact')
         resultSet[0] = resultSet[0].map((item) => {
-          const fieldsToCompress = this._config.get('products.fieldsToCompress')
-          const fieldsToCompact = this._config.get('products.fieldsToCompact')
           if (!item._source) { return item }
           if (item._source.configurable_children) {
             item._source.configurable_children = item._source.configurable_children.map((subItem) => {
