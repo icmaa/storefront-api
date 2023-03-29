@@ -4,7 +4,7 @@ import { ExtensionAPIFunctionParameter } from '@storefront-api/lib/module'
 
 import GoogleRecaptcha from 'icmaa/helpers/googleRecaptcha'
 import Redis from 'icmaa/helpers/redis'
-import { google } from 'googleapis'
+import GoogleSheets from '@googleapis/sheets'
 
 module.exports = ({ config }: ExtensionAPIFunctionParameter): Router => {
   const api = Router()
@@ -32,7 +32,7 @@ module.exports = ({ config }: ExtensionAPIFunctionParameter): Router => {
     const credentials = config.get<Record<string, any>>('icmaa.googleServiceAccount')
     const clientOptions = { subject: credentials.subject }
     const scopes = ['https://www.googleapis.com/auth/spreadsheets']
-    const auth = new google.auth.GoogleAuth({ scopes, clientOptions, credentials })
+    const auth = new GoogleSheets.auth.GoogleAuth({ scopes, clientOptions, credentials })
     const client = await auth.getClient()
 
     // We can't go on here because we need domain-wide acces to docs
@@ -46,7 +46,7 @@ module.exports = ({ config }: ExtensionAPIFunctionParameter): Router => {
     // If the error "unauthorized_client" appears, delete and recreate the client in admin-console.
     // @see https://developers.google.com/identity/protocols/oauth2/service-account#error-codes
 
-    const sheetsApi = google.sheets('v4')
+    const sheetsApi = GoogleSheets.sheets('v4')
     await sheetsApi.spreadsheets.values
       .append({
         auth: client,

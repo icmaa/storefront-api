@@ -12,6 +12,6 @@
     "*.js"
   ],
   "dependencies": {
-    "googleapis": "^45.0.0"
+    "@googleapis/sheets": "^4.0.2"
   }
 }
