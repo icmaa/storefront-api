@@ -25,8 +25,7 @@ export type Option = {
   sort_order: number
 }
 
-export function getAttributesFromProductsAttributesMetaData (items: { _source: Product }[])
-  : Record<string, Attribute<Option>> {
+export function getAttributesFromProductsAttributesMetaData (items: { _source: Product }[]): Attribute<Option>[] {
   const attributes = {}
   items.forEach(({ _source: item }) => {
     if (!item.attributes_metadata) return
@@ -48,5 +47,5 @@ export function getAttributesFromProductsAttributesMetaData (items: { _source: P
     delete item.attributes_metadata
   })
 
-  return attributes
+  return Object.values(attributes)
 }
