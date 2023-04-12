@@ -8,6 +8,7 @@ import Logger from '@storefront-api/lib/logger'
 import AttributeService from '@storefront-api/default-catalog/api/attribute/service'
 import ProcessorFactory from '@storefront-api/default-catalog/processor/factory'
 import loadCustomFilters from 'icmaa-catalog/helper/loadCustomFilters'
+import { getAttributesFromProductsAttributesMetaData } from 'icmaa-catalog/api/mutator/attributeMetadata'
 
 import { IConfig } from 'config'
 import { sha3_224 } from 'js-sha3'
@@ -104,6 +105,12 @@ export default ({ config }: ExtensionAPIFunctionParameter) => async function (re
       searchQuery: new SearchQuery(requestBody),
       customFilters
     })
+  }
+
+  const loadAndAppendAttributeMeta = req.query?.load_attribute_meta || false
+  if (req.query?.load_attribute_meta) {
+    (req.query._source_include as string) += ',attributes_metadata'
+    delete req.query?.load_attribute_meta
   }
 
   let pit: { id: string, keep_alive: string } = req.query.pit ? { id: req.query.pit as string, keep_alive: '1m' } : null
@@ -229,11 +236,15 @@ export default ({ config }: ExtensionAPIFunctionParameter) => async function (re
             const productGroupId = entityType === 'product' ? groupId : undefined
             const result = await resultProcessor.process(_resBody.hits.hits, productGroupId)
             _resBody.hits.hits = result
-            if (entityType === 'product' && _resBody.aggregations && config.get<boolean>('entities.attribute.loadByAttributeMetadata')) {
-              const attributeListParam = AttributeService.transformAggsToAttributeListParam(_resBody.aggregations)
-              // find attribute list
-              const attributeList = await AttributeService.list(attributeListParam, config, indexName)
-              _resBody.attribute_metadata = attributeList.map(AttributeService.transformToMetadata)
+            if (entityType === 'product' && config.get<boolean>('entities.attribute.loadByAttributeMetadata')) {
+              if (_resBody.aggregations) {
+                const attributeListParam = AttributeService.transformAggsToAttributeListParam(_resBody.aggregations)
+                const attributeList = await AttributeService.list(attributeListParam, config, indexName)
+                _resBody.attribute_metadata = attributeList.map(AttributeService.transformToMetadata)
+              } else if (loadAndAppendAttributeMeta && result.some(({ _source }) => _source.attributes_metadata?.length > 0)) {
+                const attributes = getAttributesFromProductsAttributesMetaData(_resBody.hits.hits)
+                _resBody.attribute_metadata = attributes
+              }
             }
 
             _resBody = _outputFormatter(_resBody, responseFormat)
