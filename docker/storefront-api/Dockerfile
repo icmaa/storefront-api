@@ -13,7 +13,7 @@ RUN apk add --no-cache \
     python3 make g++ ca-certificates \
     gcc libgcc libstdc++ linux-headers \
     vips-dev fftw-dev gcc g++ make libc6-compat \
-    bash curl wget git rsync
+    bash curl wget git rsync github-cli
 
 RUN yarn global add @icmaa/config-sync
 

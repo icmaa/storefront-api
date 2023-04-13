@@ -12,18 +12,25 @@
   ],
   "service": "app",
   "workspaceFolder": "/workspace",
-  "extensions": [
-    "christian-kohler.npm-intellisense",
-    "christian-kohler.path-intellisense",
-    "dbaeumer.vscode-eslint",
-    "dotjoshjohnson.xml",
-    "esbenp.prettier-vscode",
-    "mechatroner.rainbow-csv",
-    "redhat.vscode-yaml",
-    "ria.elastic",
-    "visualstudioexptteam.vscodeintellicode",
-    "wix.vscode-import-cost",
-    "yzhang.markdown-all-in-one",
-    "ziyasal.vscode-open-in-github"
-  ]
+  "features": {
+    "ghcr.io/stuartleeks/dev-container-features/shell-history:0": {}
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "christian-kohler.npm-intellisense",
+        "christian-kohler.path-intellisense",
+        "dbaeumer.vscode-eslint",
+        "dotjoshjohnson.xml",
+        "esbenp.prettier-vscode",
+        "mechatroner.rainbow-csv",
+        "redhat.vscode-yaml",
+        "ria.elastic",
+        "visualstudioexptteam.vscodeintellicode",
+        "wix.vscode-import-cost",
+        "yzhang.markdown-all-in-one",
+        "ziyasal.vscode-open-in-github"
+      ]
+    }
+  }
 }
