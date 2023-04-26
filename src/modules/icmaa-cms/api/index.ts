@@ -4,17 +4,42 @@ import Logger from '@storefront-api/lib/logger'
 import { apiStatus } from '@storefront-api/lib/util'
 import { sha3_224 } from 'js-sha3'
 import { Router } from 'express'
+import type { Request } from 'express'
+import type { ParsedQs } from 'qs'
 
 import StoryblokConnector from '../connector/storyblok'
 import { cacheResult, cacheHandler, getCvByRequest } from '../connector/cache'
 import { getClient as esClient, adjustQuery, getTotals, getHits } from '@storefront-api/lib/elastic'
 
+type ByUidParams = ParsedQs & {
+  type: string,
+  uid: string,
+  lang?: string,
+  key?: string,
+  release?: string,
+  additional?: string
+}
+
+type SearchParams = ParsedQs & {
+  type: string,
+  q: string,
+  lang?: string,
+  fields?: string,
+  page?: number | string,
+  size?: number | string,
+  sort?: string,
+  release?: string,
+  additional?: string
+}
+
+type RequestWithParams<T> = Request<any, any, any, T>
+
 export default ({ config }: ExtensionAPIFunctionParameter): Router => {
   const api = Router()
 
-  api.get('/by-uid', async (req, res) => {
+  api.get('/by-uid', async (req: RequestWithParams<ByUidParams>, res) => {
     const { url, query } = req
-    const { type, uid, lang, key, release } = query
+    const { type, uid, lang, key, release, additional } = query
     if (type === undefined || uid === undefined) {
       return apiStatus(res, '"uid" and "type" are mandatory in request url', 500)
     }
@@ -37,7 +62,7 @@ export default ({ config }: ExtensionAPIFunctionParameter): Router => {
       case 'storyblok':
         await new StoryblokConnector()
           .setRelease(release as string)
-          .fetch({ type, uid, lang, key, cv })
+          .fetch({ type, uid, lang, key, cv, additional })
           .then(async response => {
             await cacheResult(config, response, reqHash, cacheTags)
             return apiStatus(res, response, 200)
@@ -49,9 +74,9 @@ export default ({ config }: ExtensionAPIFunctionParameter): Router => {
     }
   })
 
-  api.get('/search', async (req, res) => {
+  api.get('/search', async (req: RequestWithParams<SearchParams>, res) => {
     const { url, query } = req
-    const { type, q, lang, fields, page, size, sort, release } = query
+    const { type, q, lang, fields, page, size, sort, release, additional } = query
     if (type === undefined || q === undefined) {
       return apiStatus(res, '"q" and "type" are mandatory in request url', 500)
     }
@@ -74,7 +99,7 @@ export default ({ config }: ExtensionAPIFunctionParameter): Router => {
       case 'storyblok':
         await new StoryblokConnector()
           .setRelease(release as string)
-          .search({ type, q, lang, fields, page, size, sort, cv })
+          .search({ type, q, lang, fields, page, size, sort, cv, additional })
           .then(async response => {
             await cacheResult(config, response, reqHash, cacheTags)
             return apiStatus(res, response, 200)

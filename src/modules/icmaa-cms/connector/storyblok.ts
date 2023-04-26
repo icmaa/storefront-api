@@ -17,6 +17,43 @@ interface CreateAttributeOptionArrayParams {
   sortKey?: string
 }
 
+type UniversalParams = {
+  type: string,
+  lang: string,
+  cv?: string,
+  additional?: string
+}
+
+type FetchParams = UniversalParams & {
+  uid: string,
+  key?: string
+}
+
+type SearchParams = UniversalParams & {
+  fields: string,
+  q: string,
+  page: string | number,
+  size: string | number,
+  sort: string
+}
+
+type SearchRequestParams<T = unknown> = {
+  queryObject: Record<string, any>,
+  type: string,
+  results?: T[],
+  fields?: string,
+  page?: number,
+  size?: number,
+  sort?: string,
+  cv?: string,
+  additional?: Additional
+}
+
+type Additional = {
+  resolve_relations?: string,
+  resolve_links?: string
+}
+
 class StoryblokConnector {
   protected lang: string|boolean
   protected release: string
@@ -25,7 +62,7 @@ class StoryblokConnector {
   public api () {
     return {
       get: async (endpoint = 'cdn/stories', params: Record<string, any> = {}, cv?: string): Promise<any> => {
-        const baseUrl = 'https://api.storyblok.com/v1'
+        const baseUrl = 'https://api.storyblok.com/v2'
         const defaults = {
           token: config.get('extensions.icmaaCms.storyblok.accessToken'),
           // Storyblok needs a cache-version or will alwys serve uncached versions which leads to hit the limit quickly.
@@ -128,7 +165,7 @@ class StoryblokConnector {
     return (key.startsWith('i18n_')) ? key.slice(5) + '__i18n__' + this.lang : key
   }
 
-  public async fetch ({ type, uid, lang, key, cv }) {
+  public async fetch ({ type, uid, lang, key, cv, additional: additionalData }: FetchParams) {
     let request: Promise<any>
     const fetchById = (key && key === 'id')
     const fetchByUuid = (key && key === 'uuid')
@@ -159,12 +196,16 @@ class StoryblokConnector {
         }
       }
 
+      const additional = this.parseAdditionalData(additionalData, type)
+      console.error(additional)
+
       request = this.api().get('cdn/stories', {
         starts_with: this.lang ? `${this.lang}/*` : '',
-        filter_query_v2: {
+        filter_query: {
           component: { in: type },
           ...query
-        }
+        },
+        ...additional
       }, cv)
     }
 
@@ -185,7 +226,7 @@ class StoryblokConnector {
       })
   }
 
-  public async search ({ type, q, lang, fields, page, size, sort, cv }) {
+  public async search ({ type, q, lang, fields, page, size, sort, cv, additional: additionalData }: SearchParams) {
     this.matchLanguage(lang)
 
     let queryObject: any = { identifier: { in: q } }
@@ -194,11 +235,15 @@ class StoryblokConnector {
       queryObject = jsonQuery
     }
 
-    if (page) page = parseInt(page)
-    if (size) size = parseInt(size)
     if (sort) sort = `content.${sort}`
+    if (page && typeof page === 'string') page = parseInt(page) as number
+    if (size && typeof size === 'string') size = parseInt(size)
+    page = page as number
+    size = size as number
 
-    return this.searchRequest({ queryObject, type, fields, page, size, sort, cv })
+    const additional = this.parseAdditionalData(additionalData, type)
+
+    return this.searchRequest({ queryObject, type, fields, page, size, sort, cv, additional })
   }
 
   /**
@@ -208,7 +253,7 @@ class StoryblokConnector {
    * If you add a size and a page it will return the specific page limited by the size.
    * If you only add a size it will load the the first page with the entered size.
    */
-  public async searchRequest ({ queryObject, type, results = [], fields, page, size, sort, cv }) {
+  public async searchRequest ({ queryObject, type, results = [], fields, page, size, sort, cv, additional = {} }: SearchRequestParams) {
     const sort_by = sort ? { sort_by: sort } : {}
 
     if (!page) {
@@ -224,11 +269,12 @@ class StoryblokConnector {
       page,
       per_page: size,
       starts_with: this.lang ? `${this.lang}/*` : '',
-      filter_query_v2: {
+      filter_query: {
         component: { in: type },
         ...queryObject
       },
-      ...sort_by
+      ...sort_by,
+      ...additional
     }, cv).then(async response => {
       let stories = response.stories
         .map(story => extractStoryContent(story))
@@ -240,7 +286,7 @@ class StoryblokConnector {
         console.error('Error during plugin value mapping:', e)
       })
 
-      if (fields && fields.length > 0) {
+      if (fields?.length > 0) {
         stories = stories.map(story => pick(story, fields.split(',')))
       }
 
@@ -254,11 +300,25 @@ class StoryblokConnector {
         return results
       }
 
-      return this.searchRequest({ queryObject, type, results, fields, page: page + 1, size, sort, cv })
+      return this.searchRequest({ queryObject, type, results, fields, page: page + 1, size, sort, cv, additional })
     }).catch(e => {
       console.error('Error during parsing:', e)
       return []
     })
+  }
+
+  protected parseAdditionalData (data: string, type: string): Additional {
+    let additional: Additional = {}
+    if (data) {
+      additional = JSON.parse(data)
+      if (additional.resolve_relations && Array.isArray(additional.resolve_relations)) {
+        additional.resolve_relations = additional.resolve_relations.map(r => `${type}.${r}`).join(',')
+      }
+      if (additional.resolve_links && Array.isArray(additional.resolve_links)) {
+        additional.resolve_links = additional.resolve_links.map(r => `${type}.${r}`).join(',')
+      }
+    }
+    return additional
   }
 
   public createAttributeOptionArray ({ options, nameKey = 'label', valueKey = 'value', sortKey = 'sort_order' }: CreateAttributeOptionArrayParams) {
