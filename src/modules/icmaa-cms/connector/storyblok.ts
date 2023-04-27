@@ -8,7 +8,12 @@ import cache from '@storefront-api/lib/cache-instance'
 
 import { objectKeysToCamelCase } from '../helpers/formatter'
 import { extractStoryContent, extractPluginValues } from '../helpers/formatter/storyblok'
-import { sortBy, pick, merge } from 'lodash'
+import type { StoryblokStory, StoryblokStoryContent } from '../helpers/formatter/storyblok'
+
+import sortBy from 'lodash/sortBy'
+import pick from 'lodash/pick'
+import merge from 'lodash/merge'
+import camelCase from 'lodash/camelCase'
 
 interface CreateAttributeOptionArrayParams {
   options: any[],
@@ -46,12 +51,36 @@ type SearchRequestParams<T = unknown> = {
   size?: number,
   sort?: string,
   cv?: string,
-  additional?: Additional
+  additional?: AdditionalDTO
 }
 
 type Additional = {
-  resolve_relations?: string,
-  resolve_links?: string
+  resolve_relations?: string
+}
+
+type RawAdditionalParam = {
+  [Property in keyof Additional]?: string[];
+}
+
+type AdditionalDTO = {
+  data: Additional,
+  raw: RawAdditionalParam
+}
+
+interface StoryblokStoryResponse<
+  S = StoryblokStory,
+  R = StoryblokStory,
+  L = Record<string, unknown>
+> {
+  stories: S[],
+  cv?: number,
+  rels: R[],
+  links: L[]
+}
+
+interface StoryblokDatasourceResponse<S = Record<string, unknown>> {
+  datasource_entries: S[],
+  cv?: number
 }
 
 class StoryblokConnector {
@@ -61,7 +90,7 @@ class StoryblokConnector {
 
   public api () {
     return {
-      get: async (endpoint = 'cdn/stories', params: Record<string, any> = {}, cv?: string): Promise<any> => {
+      get: async <T = StoryblokStoryResponse>(endpoint = 'cdn/stories', params: Record<string, any> = {}, cv?: string): Promise<T> => {
         const baseUrl = 'https://api.storyblok.com/v2'
         const defaults = {
           token: config.get('extensions.icmaaCms.storyblok.accessToken'),
@@ -171,17 +200,18 @@ class StoryblokConnector {
     const fetchByUuid = (key && key === 'uuid')
 
     this.matchLanguage(lang)
+    const additional = this.parseAdditionalData(additionalData, type)
 
     if (fetchById) {
       request = this.api().get(
         `cdn/stories/${uid}`,
-        { language: this.lang ? this.lang : undefined },
+        { language: this.lang ? this.lang : undefined, ...additional?.data || {} },
         cv
       )
     } else if (fetchByUuid) {
       request = this.api().get(
         'cdn/stories',
-        { by_uuids: uid, language: this.lang ? this.lang : undefined },
+        { by_uuids: uid, language: this.lang ? this.lang : undefined, ...additional?.data || {} },
         cv
       )
     } else {
@@ -196,16 +226,13 @@ class StoryblokConnector {
         }
       }
 
-      const additional = this.parseAdditionalData(additionalData, type)
-      console.error(additional)
-
       request = this.api().get('cdn/stories', {
         starts_with: this.lang ? `${this.lang}/*` : '',
         filter_query: {
           component: { in: type },
           ...query
         },
-        ...additional
+        ...additional?.data || {}
       }, cv)
     }
 
@@ -214,12 +241,13 @@ class StoryblokConnector {
         const story = fetchById
           ? response.story || {}
           : response.stories.shift() || {}
-        const content = extractStoryContent(story)
-        objectKeysToCamelCase(content)
-        await extractPluginValues(content).catch(e => {
-          console.error('Error during plugin value mapping:', e)
-        })
-        return content
+
+        const content = await this.transformStories(
+          [story],
+          response.rels,
+          additional
+        )
+        return content.shift()
       }).catch(e => {
         console.error('Error during parsing:', e)
         return { }
@@ -253,7 +281,7 @@ class StoryblokConnector {
    * If you add a size and a page it will return the specific page limited by the size.
    * If you only add a size it will load the the first page with the entered size.
    */
-  public async searchRequest ({ queryObject, type, results = [], fields, page, size, sort, cv, additional = {} }: SearchRequestParams) {
+  public async searchRequest ({ queryObject, type, results = [], fields, page, size, sort, cv, additional }: SearchRequestParams) {
     const sort_by = sort ? { sort_by: sort } : {}
 
     if (!page) {
@@ -274,17 +302,13 @@ class StoryblokConnector {
         ...queryObject
       },
       ...sort_by,
-      ...additional
+      ...additional?.data || {}
     }, cv).then(async response => {
-      let stories = response.stories
-        .map(story => extractStoryContent(story))
-        .map(story => objectKeysToCamelCase(story))
-
-      stories = await Promise.all(
-        stories.map(story => extractPluginValues(story))
-      ).catch(e => {
-        console.error('Error during plugin value mapping:', e)
-      })
+      let stories = await this.transformStories(
+        response.stories,
+        response.rels,
+        additional
+      )
 
       if (fields?.length > 0) {
         stories = stories.map(story => pick(story, fields.split(',')))
@@ -307,18 +331,56 @@ class StoryblokConnector {
     })
   }
 
-  protected parseAdditionalData (data: string, type: string): Additional {
-    let additional: Additional = {}
-    if (data) {
-      additional = JSON.parse(data)
-      if (additional.resolve_relations && Array.isArray(additional.resolve_relations)) {
-        additional.resolve_relations = additional.resolve_relations.map(r => `${type}.${r}`).join(',')
-      }
-      if (additional.resolve_links && Array.isArray(additional.resolve_links)) {
-        additional.resolve_links = additional.resolve_links.map(r => `${type}.${r}`).join(',')
+  protected async transformStories<T extends StoryblokStoryContent> (payload: StoryblokStory<T>[], relations?: StoryblokStory<T>[], additional?: AdditionalDTO): Promise<Partial<T>[]> {
+    let extractedPayload = payload
+      .map(story => extractStoryContent<T>(story))
+      .map(story => objectKeysToCamelCase(story as T))
+
+    extractedPayload = await Promise.all(
+      extractedPayload.map(story => extractPluginValues<T>(story))
+    ).catch(e => {
+      console.error('Error during plugin value mapping:', e)
+      return extractedPayload
+    })
+
+    if (relations && additional?.data?.resolve_relations) {
+      const rels = await this.transformStories(relations)
+      additional.raw.resolve_relations
+        .map(camelCase)
+        .forEach(key => {
+          extractedPayload = extractedPayload.map(story => {
+            if (story[key]) {
+              if (Array.isArray(story[key])) {
+                story[key] = story[key].map(uuid => {
+                  const rel = rels.find(r => r.uuid === uuid)
+                  return rel || uuid
+                })
+              } else {
+                const rel = rels.find(r => r.uuid === story[key])
+                if (rel) story[key] = rel
+              }
+            }
+            return story
+          })
+        })
+    }
+
+    return extractedPayload
+  }
+
+  protected parseAdditionalData (payload: string, type: string): AdditionalDTO {
+    let raw = {}
+    let data: Additional = {}
+
+    if (payload) {
+      raw = JSON.parse(payload)
+      data = Object.assign({}, raw)
+      if (data.resolve_relations && Array.isArray(data.resolve_relations)) {
+        data.resolve_relations = data.resolve_relations.map(r => `${type}.${r}`).join(',')
       }
     }
-    return additional
+
+    return { data, raw }
   }
 
   public createAttributeOptionArray ({ options, nameKey = 'label', valueKey = 'value', sortKey = 'sort_order' }: CreateAttributeOptionArrayParams) {
@@ -338,7 +400,7 @@ class StoryblokConnector {
 
   public async datasource ({ code, page = 1 }) {
     try {
-      return this.api().get('cdn/datasource_entries', {
+      return this.api().get<StoryblokDatasourceResponse>('cdn/datasource_entries', {
         datasource: code,
         page: page,
         per_page: 1000
