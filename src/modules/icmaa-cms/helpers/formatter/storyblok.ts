@@ -3,6 +3,37 @@ import forEach from 'lodash/forEach'
 import config from 'config'
 import RichTextResolver from './storyblok/richTextResolver'
 
+export type StoryblokStoryContent = {
+  _uid: string,
+  uid: string,
+  uuid: string
+}
+
+export interface StoryblokStory<T = StoryblokStoryContent> {
+  name: string,
+  created_at: string,
+  published_at: string,
+  id: number,
+  uuid: string,
+  content: T & StoryblokStoryContent,
+  slug: string,
+  full_slug: string,
+  sort_by_date: null | unknown,
+  position: number,
+  tag_list: string[],
+  is_startpage: boolean,
+  parent_id: number,
+  meta_data: null | unknown,
+  group_id: string,
+  first_published_at: string,
+  release_id: string | number | null,
+  lang: string,
+  path: null | string,
+  alternates: unknown[],
+  default_full_slug: string | null,
+  translated_slugs: string | null
+}
+
 const pluginMap: Record<string, any>[] = config.get('extensions.icmaaCms.storyblok.pluginFieldMap')
 const metaFieldsToTransport = [{ id: 'story_id' }, { name: 'uname' }, 'uuid', 'published_at', 'created_at', 'first_published_at']
 
@@ -16,7 +47,7 @@ const marked = (string, options) => {
 
 const rtResolver = new RichTextResolver()
 
-export const extractPluginValues = async <T>(object: Record<string, any>): Promise<Record<string, any>> => {
+export const extractPluginValues = async <T>(object: Record<string, any>): Promise<T> => {
   for (const key in object) {
     const v = object[key]
     if (v && typeof v === 'object') {
@@ -59,10 +90,10 @@ export const extractPluginValues = async <T>(object: Record<string, any>): Promi
     }
   }
 
-  return object
+  return object as T
 }
 
-export const extractStoryContent = (object: Record<string, any>): Record<string, any> => {
+export const extractStoryContent = <T = StoryblokStoryContent>(object: StoryblokStory<T>): Partial<T> => {
   if (Object.values(object).length === 0) {
     return {}
   }
@@ -77,7 +108,7 @@ export const extractStoryContent = (object: Record<string, any>): Record<string,
   })
 
   const regex = /^group_[\w]/
-  forEach(content, (v, k) => {
+  forEach(content as Record<string, unknown>, (v, k) => {
     if (regex.exec(k) !== null) {
       delete content[k]
     }

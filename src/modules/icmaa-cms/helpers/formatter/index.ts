@@ -1,6 +1,6 @@
 import camelCase from 'lodash/camelCase'
 
-export const objectKeysToCamelCase = (object: Record<string, any>): Record<string, any> => {
+export const objectKeysToCamelCase = <T>(object: T): Partial<T> => {
   for (const key in object) {
     const ccKey = camelCase(key)
     if (ccKey !== key) {
