@@ -6,7 +6,7 @@ const hasCacheHeader = (req: Request): boolean => !!req.header('X-VS-Cache-Bypas
 
 const getCvByRequest = (req: Request): string|undefined => hasCacheHeader(req) ? 'flush-' + Date.now().toString() : undefined
 
-const cacheResult = async (config: Record<string, any>, result: any, hash: string, tags: string[]): Promise<void> => {
+const cacheResult = async <T = unknown>(config: Record<string, any>, result: T, hash: string, tags: string[]): Promise<void> => {
   if (config.server.useOutputCache && cache) {
     await cache
       .set('api:' + hash, result, tags)
@@ -16,7 +16,7 @@ const cacheResult = async (config: Record<string, any>, result: any, hash: strin
   }
 }
 
-const cacheHandler = async (config: Record<string, any>, res: Record<string, any>, hash: string, req: Request): Promise<boolean|string> => {
+const cacheHandler = async <R extends Request>(config: Record<string, any>, res: Record<string, any>, hash: string, req: R): Promise<boolean|string> => {
   if (!hasCacheHeader(req) && config.server.useOutputCache && cache) {
     return cache.get(
       'api:' + hash
