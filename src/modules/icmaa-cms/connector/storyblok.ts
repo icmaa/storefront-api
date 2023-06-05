@@ -257,10 +257,26 @@ class StoryblokConnector {
   public async search ({ type, q, lang, fields, page, size, sort, cv, additional: additionalData }: SearchParams) {
     this.matchLanguage(lang)
 
+    const additional = this.parseAdditionalData(additionalData, type)
+
     let queryObject: any = { identifier: { in: q } }
     const jsonQuery: any = this.isJsonString(q)
     if (jsonQuery) {
       queryObject = jsonQuery
+
+      if (queryObject?.uuid) {
+        return this.api().get(
+          'cdn/stories',
+          { by_uuids: queryObject.uuid, language: this.lang ? this.lang : undefined, ...additional?.data || {} },
+          cv
+        ).then(response => {
+          return this.transformStories(
+            response.stories,
+            response.rels,
+            additional
+          )
+        })
+      }
     }
 
     if (sort) sort = `content.${sort}`
@@ -268,8 +284,6 @@ class StoryblokConnector {
     if (size && typeof size === 'string') size = parseInt(size)
     page = page as number
     size = size as number
-
-    const additional = this.parseAdditionalData(additionalData, type)
 
     return this.searchRequest({ queryObject, type, fields, page, size, sort, cv, additional })
   }
