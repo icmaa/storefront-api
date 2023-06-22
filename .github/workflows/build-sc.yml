@@ -71,7 +71,7 @@ jobs:
             ${{ github.repository }}:${{ env.ENV == 'production' && 'prod' || 'test' }}-${{ env.VERSION_NAME }}
           push: true
 
-      - name: Trigger SC Gitlab Pipeline
+      - name: Trigger ScaleCommerce Gitlab-Pipeline
         run: |
           curl \
           --location 'https://gitlab.scale.sc/api/v4/projects/${{ secrets.SC_GITLAB_PROJECT_ID }}/trigger/pipeline' \
