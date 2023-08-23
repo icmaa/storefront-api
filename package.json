@@ -105,6 +105,7 @@
     "icmaa-paypal": "*",
     "icmaa-platform-magento1": "*",
     "icmaa-product-alert": "*",
+    "icmaa-recommendations": "*",
     "icmaa-review": "*",
     "icmaa-spotify": "*",
     "icmaa-twitter": "*",
