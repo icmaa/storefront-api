@@ -7,10 +7,30 @@ import gcpRetail from '@google-cloud/retail'
 module.exports = ({ config }: ExtensionAPIFunctionParameter): Router => {
   const api = Router()
 
-  api.post('/form', async (req, res) => {
+  api.get('/test', async (req, res) => {
     // const { spreadsheetId, form } = req.body
 
-    apiStatus(res, 'true', 200)
+    const credentials = config.get<Record<string, any>>('extensions.icmaaRecommendations.googleServiceAccount')
+    const client = new gcpRetail.PredictionServiceClient({
+      credentials,
+      projectId: credentials.project_id
+    })
+
+    const resp = await client.predict({
+      validateOnly: false,
+      placement: 'projects/icmaaadwords01/locations/global/catalogs/default_catalog/servingConfigs/recommended-for-you',
+      userEvent: {
+        eventType: 'detail-page-view',
+        visitorId: 'GA1.2.1860065935.1692687468',
+        productDetails: [{
+          product: {
+            id: '00073390'
+          }
+        }]
+      }
+    })
+
+    apiStatus(res, resp[0].results, 200)
   })
 
   return api
