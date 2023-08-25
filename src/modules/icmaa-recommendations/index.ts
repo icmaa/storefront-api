@@ -7,30 +7,44 @@ import gcpRetail from '@google-cloud/retail'
 module.exports = ({ config }: ExtensionAPIFunctionParameter): Router => {
   const api = Router()
 
-  api.get('/test', async (req, res) => {
-    // const { spreadsheetId, form } = req.body
+  api.post('/list', async (req, res) => {
+    const { servingConfigs, eventType, visitorId, userEvent } = req.body
+    if (!servingConfigs || servingConfigs === '') return apiStatus(res, 'No servingConfigs provided', 400)
+    if (!eventType || eventType === '') return apiStatus(res, 'No eventType provided', 400)
+    if (!visitorId || visitorId === '') return apiStatus(res, 'No visitorId provided', 400)
+
+    const additionalUserEvent = userEvent || {}
 
     const credentials = config.get<Record<string, any>>('extensions.icmaaRecommendations.googleServiceAccount')
+    const { project_id: projectId } = credentials
     const client = new gcpRetail.PredictionServiceClient({
       credentials,
-      projectId: credentials.project_id
+      projectId
     })
 
-    const resp = await client.predict({
+    const pageSize = req.body?.pageSize || 6
+    const placement = `projects/${projectId}/locations/global/catalogs/default_catalog/servingConfigs/${servingConfigs}`
+
+    /** @src https://cloud.google.com/retail/docs/reference/rest/v2/projects.locations.catalogs.servingConfigs/predict */
+    await client.predict({
       validateOnly: false,
-      placement: 'projects/icmaaadwords01/locations/global/catalogs/default_catalog/servingConfigs/recommended-for-you',
+      placement,
       userEvent: {
-        eventType: 'detail-page-view',
-        visitorId: 'GA1.2.1860065935.1692687468',
-        productDetails: [{
-          product: {
-            id: '00073390'
-          }
-        }]
+        ...additionalUserEvent,
+        eventType,
+        visitorId
+      },
+      pageSize
+    }).then(resp => {
+      if (resp[0]?.results) {
+        apiStatus(res, resp[0].results.map(r => r.id), 200)
+      } else {
+        apiStatus(res, resp || {}, 200)
       }
+    }).catch(err => {
+      const { code, details: message } = err
+      apiStatus(res, { code, message }, 500)
     })
-
-    apiStatus(res, resp[0].results, 200)
   })
 
   return api

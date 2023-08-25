@@ -30,12 +30,11 @@
 3. Change the original endpoint of VSF in `local.json` to:
    ```
    "icmaa_recommendations": {
-     "endpoint": "/api/icmaa-recommendations"
+     "endpoint": "/api/icmaa-recommendations/list"
    }
    ```
 
 ## API endpoints
 ```
-/api/ext/icmaa-recommendations/form
-/api/icmaa-recommendations/form
+POST /api/icmaa-recommendations/list
 ```
