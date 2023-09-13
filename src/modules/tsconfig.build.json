@@ -13,6 +13,7 @@
     { "path": "./icmaa-mailer" },
     { "path": "./icmaa-newsletter" },
     { "path": "./icmaa-product-alert" },
+    { "path": "./icmaa-recommendations" },
     { "path": "./icmaa-review" },
     { "path": "./icmaa-spotify" },
     { "path": "./icmaa-twitter" },
