@@ -14,6 +14,8 @@ module.exports = ({ config }: ExtensionAPIFunctionParameter): Router => {
     if (!visitorId || visitorId === '') return apiStatus(res, 'No visitorId provided', 400)
 
     const additionalUserEvent = userEvent || {}
+    const filter = req.body?.filter ? { filter: req.body?.filter } : {}
+    const params = req.body?.params || {}
 
     const credentials = config.get<Record<string, any>>('extensions.icmaaRecommendations.googleServiceAccount')
     const { project_id: projectId } = credentials
@@ -34,7 +36,9 @@ module.exports = ({ config }: ExtensionAPIFunctionParameter): Router => {
         eventType,
         visitorId
       },
-      pageSize
+      pageSize,
+      params: { filterSyntaxV2: { boolValue: true }, ...params },
+      ...filter
     }).then(resp => {
       if (resp[0]?.results) {
         apiStatus(res, resp[0].results.map(r => r.id), 200)
