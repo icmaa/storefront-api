@@ -7,6 +7,7 @@ export default (options) => {
 
   const serverUrl = options.url
   const auth = options.auth ? { auth: options.auth } : {}
+  const headers = options?.headers || {}
 
   const oauth = OAuth({
     consumer: {
@@ -58,7 +59,7 @@ export default (options) => {
       url: request_data.url,
       method: request_data.method,
       ...auth,
-      headers: { ...auth, ...authToken },
+      headers: { ...headers, ...auth, ...authToken },
       json: true,
       body: request_data.body
     }
@@ -77,7 +78,7 @@ export default (options) => {
         url: request_data.url,
         method: request_data.method,
         ...auth,
-        headers: { ...authToken },
+        headers: { ...headers, ...authToken },
         json: true,
         body: request_data.body,
         jar
